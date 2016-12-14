@@ -1,2 +1,2 @@
 # spinnakerhackfest
-Jenkins and Spinnaker
+Jenkins and Spinnaker VM template
