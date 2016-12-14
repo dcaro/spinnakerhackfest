@@ -186,7 +186,7 @@
           "fileUris": [
             "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh"
           ],
-          "commandToExecute": "[concat('sh set_azure_jenkins.sh', ' ', parameters('adminUserName'), ' ', parameters('adminPassword'))]"
+          "commandToExecute": "[concat('sh set_azure_spinnaker.sh', ' ', parameters('adminUserName'), ' ', parameters('adminPassword'))]"
         }
       }
     }
