@@ -52,8 +52,8 @@ sudo rm /var/lib/dpkg/updates/*
 sudo printf "directory /var/lib/dpkg/updates removed \n" >> /tmp/debug
 sudo apt-get update -y
 sudo printf "apt-get update completed \n" >> /tmp/debug
-sudo apt-get upgrade -y
-sudo printf "apt-get upgrade completed \n" >> /tmp/debug
+# sudo apt-get upgrade -y
+# sudo printf "apt-get upgrade completed \n" >> /tmp/debug
 
 # Install Spinnaker on the VM
 sudo printf "Starting to install Spinnaker\n" >> /tmp/debug
