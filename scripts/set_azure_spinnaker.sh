@@ -54,12 +54,15 @@ sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/m
 sudo printf "Spinnaked has been installed\n" >> /tmp/debug
 
 # Update and upgrade packages
-sudo apt-get update -y && sudo apt-get upgrade spinnaker -y
-sudo printf "System updated\n" >> /tmp/debug
+# sudo apt-get update -y
+# sudo apt-get upgrade spinnaker -y
+# sudo printf "Spinnaker updated\n" >> /tmp/debug
 
 # Configuring the /opt/spinnaker/config/default-spinnaker-local.yml
 # Let's create the sed command file and run the sed command
- 
+
+sudo printf "Setting up sedCommand \n" >> /tmp/debug
+
 echo 's/enabled: ${SPINNAKER_AZURE_ENABLED:false}/enabled: ${SPINNAKER_AZURE_ENABLED:true}/' > /tmp/sedCommand.sed
 echo 's/clientId:$/& '$CLIENTID'/' >> /tmp/sedCommand.sed
 echo 's/appKey:$/& '$PASSWORD'/' >> /tmp/sedCommand.sed
