@@ -30,6 +30,7 @@ done
 
 export BINTRAY='http:\/\/dl.bintray.com\/richardguthrie\/rguthrie-spinnaker_trusty_release'
 export STDDR='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu_trusty_main'
+export WORKDIR=pwd
 
 # Record the Variables in text file for debugging purposes  
 sudo touch /tmp/helloworld
@@ -42,26 +43,38 @@ sudo printf "Packer Storage Account is %s \n" $PACKERSTORAGEACCOUNT >> /tmp/hell
 sudo printf "Default Resource Group %s \n" $RESOURCEGROUP >> /tmp/helloworld
 sudo printf "Key Vault %s \n" $KEYVAULT >> /tmp/helloworld
 
+sudo touch /tmp/debug
+sudo printf "working directory is %s\n" $WORKDIR
+sudo printf "Starting to install Spinnaker\n" >> /tmp/debug
+
 # Install Spinnaker on the VM
 sudo printf "azure\nwestus\n" > spinnaker.inputs
 sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < spinnaker.inputs 
 
+sudo printf "Spinnaked has been installed\n" >> /tmp/debug
+
 # Update and upgrade packages
 sudo apt-get update -y && sudo apt-get upgrade spinnaker -y
+sudo printf "System updated\n" >> /tmp/debug
 
 # Configuring the /opt/spinnaker/config/default-spinnaker-local.yml
 # Let's create the sed command file and run the sed command
  
-echo 's/enabled: ${SPINNAKER_AZURE_ENABLED:false}/enabled: ${SPINNAKER_AZURE_ENABLED:true}/' > sedCommand.sed
+echo 's/enabled: ${SPINNAKER_AZURE_ENABLED:false}/enabled: ${SPINNAKER_AZURE_ENABLED:true}/' > /tmp/sedCommand.sed
 echo 's/clientId:$/& '$CLIENTID'/' >> sedCommand.sed
 echo 's/appKey:$/& '$PASSWORD'/' >> sedCommand.sed
 echo 's/tenantId:$/& '$TENANTID'/' >> sedCommand.sed
 echo 's/subscriptionId:$/& '$SUBSCRIPTIONID'/' >> sedCommand.sed
 # Adding the PackerResourceGroup, the PackerStorageAccount, the defaultResourceGroup and the defaultKeyVault  
 echo '/subscriptionId:/a\      packerResourceGroup: '$PACKERRESOURCEGROUP'\n      packerStorageAccount: '$PACKERSTORAGEACCOUNT'\n      defaultResourceGroup: '$RESOURCEGROUP'\n      defaultKeyVault: '$KEYVAULT'' >> sedCommand.sed
+sudo printf "sedCommand.sed file created\n" >> /tmp/debug
 
 sudo sed -i -f sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml  
+
+sudo printf "spinnaker-local.yml file has been updated\n" >> /tmp/debug
 
 # Configure rosco.yaml file  
 sudo sed '/^# debianRepository:/s/.*/debianRepository: '$STDDR':'$BINTRAY'/'  /opt/rosco/config/rosco.yml
 sudo sed '/defaultCloudProviderType/s/.*/defaultCloudProviderType: azure/' /opt/rosco/config/rosco.yml
+
+sudo printf "rosco.yml file has been updated\n" >> /tmp/debug
