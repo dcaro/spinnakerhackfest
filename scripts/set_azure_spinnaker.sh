@@ -79,7 +79,7 @@ sudo printf "s/subscriptionId:$/& %s/\n" $SUBSCRIPTIONID >> /tmp/sedCommand.sed
 sudo printf "s/packerResourceGroup:$/& %s/\n" $PACKERRESOURCEGROUP >> /tmp/sedCommand.sed
 sudo printf "s/packerStorageAccount:$/& %s/\n" $PACKERSTORAGEACCOUNT >> /tmp/sedCommand.sed
 sudo printf "s/defaultResourceGroup:$/& %s/\n" $RESOURCEGROUP >> /tmp/sedCommand.sed
-sudo printf "defaultKeyVault:$/& %s/\n" $KEYVAULT >> /tmp/sedCommand.sed
+sudo printf "s/defaultKeyVault:$/& %s/\n" $KEYVAULT >> /tmp/sedCommand.sed
 sudo printf "sedCommand.sed file created\n" >> /tmp/debug
 
 sudo sed -i -f sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml  
