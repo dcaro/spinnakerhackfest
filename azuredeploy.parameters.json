@@ -9,13 +9,13 @@
       "value": "P@ssw0rd!"
     },
     "newStorageAccountName": {
-      "value": "golivebogusstorage"
+      "value": "dcarospinnaker1"
     },
     "vmSize": {
-      "value": "Standard_D1"
+      "value": "Standard_D2"
     },
     "dnsNameForPublicIP": {
-      "value": "golivespinnakervm02"
+      "value": "dcarospinnaker1"
     }
   }
 }
