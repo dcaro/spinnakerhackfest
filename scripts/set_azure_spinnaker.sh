@@ -45,31 +45,35 @@ sudo printf "Key Vault %s \n" $KEYVAULT >> /tmp/helloworld
 
 sudo touch /tmp/debug
 sudo printf "working directory is %s\n" $WORKDIR >> /tmp/debug
-sudo printf "Starting to install Spinnaker\n" >> /tmp/debug
+
+sudo printf "Upgrading the environment \n" >> /tmp/debug
+# Update and upgrade packages
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo printf "VM updated\n" >> /tmp/debug
 
 # Install Spinnaker on the VM
+sudo printf "Starting to install Spinnaker\n" >> /tmp/debug
 sudo printf "azure\nwestus\n" > /tmp/spinnaker.inputs
 sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < /tmp/spinnaker.inputs 
-
 sudo printf "Spinnaked has been installed\n" >> /tmp/debug
 
-# Update and upgrade packages
-# sudo apt-get update -y
-# sudo apt-get upgrade spinnaker -y
-# sudo printf "Spinnaker updated\n" >> /tmp/debug
+sudo apt-get update
+sudo apt-get upgrade spinnaker
+sudo printf "updating spinnaker \n" >> /tmp/debug
 
 # Configuring the /opt/spinnaker/config/default-spinnaker-local.yml
 # Let's create the sed command file and run the sed command
 
 sudo printf "Setting up sedCommand \n" >> /tmp/debug
 
-echo 's/enabled: ${SPINNAKER_AZURE_ENABLED:false}/enabled: ${SPINNAKER_AZURE_ENABLED:true}/' > /tmp/sedCommand.sed
-echo 's/clientId:$/& '$CLIENTID'/' >> /tmp/sedCommand.sed
-echo 's/appKey:$/& '$PASSWORD'/' >> /tmp/sedCommand.sed
-echo 's/tenantId:$/& '$TENANTID'/' >> /tmp/sedCommand.sed
-echo 's/subscriptionId:$/& '$SUBSCRIPTIONID'/' >> /tmp/sedCommand.sed
+sudo printf "s/enabled: ${SPINNAKER_AZURE_ENABLED:false}/enabled: ${SPINNAKER_AZURE_ENABLED:true}/\n" > /tmp/sedCommand.sed
+sudo printf "s/clientId:$/& %s/\n" $CLIENTID >> /tmp/sedCommand.sed
+sudo printf "s/appKey:$/& %s/\n" $PASSWORD >> /tmp/sedCommand.sed
+sudo printf "s/tenantId:$/& %s/\n" $TENANTID >> /tmp/sedCommand.sed
+sudo printf "s/subscriptionId:$/& %s/\n" $SUBSCRIPTIONID >> /tmp/sedCommand.sed
 # Adding the PackerResourceGroup, the PackerStorageAccount, the defaultResourceGroup and the defaultKeyVault  
-echo '/subscriptionId:/a\      packerResourceGroup: '$PACKERRESOURCEGROUP'\n      packerStorageAccount: '$PACKERSTORAGEACCOUNT'\n      defaultResourceGroup: '$RESOURCEGROUP'\n      defaultKeyVault: '$KEYVAULT'' >> /tmp/sedCommand.sed
+sudo printf "/subscriptionId:/a\      packerResourceGroup: %s\n      packerStorageAccount: %s\n      defaultResourceGroup: %s\n      defaultKeyVault: %s\n" $PACKERRESOURCEGROUP $PACKERSTORAGEACCOUNT $RESOURCEGROUP $KEYVAULT >> /tmp/sedCommand.sed
 sudo printf "sedCommand.sed file created\n" >> /tmp/debug
 
 sudo sed -i -f sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml  
