@@ -115,18 +115,18 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "subnet0Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet0Name'))]",
     "credentials": {
-      "tenantId": "[concat(' -t ', parameters('tenantId')]",
-      "subscriptionId": "[concat(' -s ', parameters('subscriptionId')]",
-      "clientId": "[concat(' -c ', parameters('clientId')]",
-      "clientSecret": "[concat(' -p ', parameters('clientSecret')]"
+      "tenantId": "[concat(' -t ', parameters('tenantId'))]",
+      "subscriptionId": "[concat(' -s ', parameters('subscriptionId'))]",
+      "clientId": "[concat(' -c ', parameters('clientId'))]",
+      "clientSecret": "[concat(' -p ', parameters('clientSecret'))]"
     },
     "packer": {
-      "resourceGroupName": "[concat(' -g ', parameters('packerResourceGroupName')]",
-      "storageAccountName": "[concat(' -h ', parameters('packerStorageAccountName')]"
+      "resourceGroupName": "[concat(' -g ', parameters('packerResourceGroupName'))]",
+      "storageAccountName": "[concat(' -h ', parameters('packerStorageAccountName'))]"
     },
     "keyVault": {
-      "resourceGroupName": "[concat(' -r ', parameters('keyVaultResourceGroupName')]",
-      "keyVaultName": "[concat(' -k ', parameters('keyVaultAccountName')]"
+      "resourceGroupName": "[concat(' -r ', parameters('keyVaultResourceGroupName'))]",
+      "keyVaultName": "[concat(' -k ', parameters('keyVaultAccountName'))]"
     },
     "customScript": {
       "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh",
@@ -134,6 +134,60 @@
     }
   },
   "resources": [
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2015-06-01",
+      "name": "[parameters('keyVaultAccountName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "enabledForVolumeEncryption": true,
+        "tenantId": "[parameters('tenantId')]",
+        "accessPolicies": [
+          {
+            "tenantId": "[parameters('tenantId')]",
+            "objectId": "[parameters('clientId')]",
+            "permissions": {
+              "keys": [
+                "all"
+              ],
+              "secrets": [
+                "get"
+              ]
+            }
+          }
+        ],
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        }
+      },
+      "resources": [
+        {
+          "type": "secrets",
+          "name": "VMUsername",
+          "apiVersion": "2015-06-01",
+          "properties": {
+            "value": "[parameters('username')]"
+          },
+          "dependsOn": [
+            "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultAccountName'))]"
+          ]
+        },
+        {
+          "type": "secrets",
+          "name": "VMPassword",
+          "apiVersion": "2015-06-01",
+          "properties": {
+            "value": "[parameters('password')]"
+          },
+          "dependsOn": [
+            "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultAccountName'))]"
+          ]
+        }
+      ]
+    },
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('newStorageAccountName')]",
