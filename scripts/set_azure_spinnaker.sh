@@ -43,7 +43,7 @@ sudo printf "Default Resource Group %s \n" $RESOURCEGROUP >> /tmp/helloworld
 sudo printf "Key Vault %s \n" $KEYVAULT >> /tmp/helloworld
 
 # Install Spinnaker on the VM
-printf "azure\nwestus\n" > spinnaker.inputs
+sudo printf "azure\nwestus\n" > spinnaker.inputs
 sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < spinnaker.inputs 
 
 # Update and upgrade packages
