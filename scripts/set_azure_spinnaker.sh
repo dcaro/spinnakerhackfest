@@ -34,14 +34,14 @@ export WORKDIR=$(pwd)
 
 # Record the Variables in text file for debugging purposes  
 sudo touch /tmp/helloworld
-sudo printf "Tenant: %s \n" $TENANTID > /tmp/helloworld
-sudo printf "Secret is %s \n" $PASSWORD >> /tmp/helloworld
-sudo printf "Client ID %s \n" $CLIENTID >> /tmp/helloworld
-sudo printf "Subscription is %s \n" $SUBSCRIPTIONID >> /tmp/helloworld
-sudo printf "Packer Resource Groups is %s \n" $PACKERRESOURCEGROUP >> /tmp/helloworld
-sudo printf "Packer Storage Account is %s \n" $PACKERSTORAGEACCOUNT >> /tmp/helloworld
-sudo printf "Default Resource Group %s \n" $RESOURCEGROUP >> /tmp/helloworld
-sudo printf "Key Vault %s \n" $KEYVAULT >> /tmp/helloworld
+sudo printf "TENANTID=%s\n" $TENANTID > /tmp/helloworld
+sudo printf "PASSWORD=%s\n" $PASSWORD >> /tmp/helloworld
+sudo printf "CLIENTID=%s\n" $CLIENTID >> /tmp/helloworld
+sudo printf "SUBSCRIPTIONID=%s\n" $SUBSCRIPTIONID >> /tmp/helloworld
+sudo printf "PACKERRESOURCEGROUP=%s\n" $PACKERRESOURCEGROUP >> /tmp/helloworld
+sudo printf "PACKERSTORAGEACCOUNT=%s\n" $PACKERSTORAGEACCOUNT >> /tmp/helloworld
+sudo printf "RESOURCEGROUP=%s\n" $RESOURCEGROUP >> /tmp/helloworld
+sudo printf "KEYVAULT=%s\n" $KEYVAULT >> /tmp/helloworld
 
 sudo touch /tmp/debug
 sudo printf "working directory is %s\n" $WORKDIR >> /tmp/debug
@@ -76,7 +76,10 @@ sudo printf "s/appKey:$/& %s/\n" $PASSWORD >> /tmp/sedCommand.sed
 sudo printf "s/tenantId:$/& %s/\n" $TENANTID >> /tmp/sedCommand.sed
 sudo printf "s/subscriptionId:$/& %s/\n" $SUBSCRIPTIONID >> /tmp/sedCommand.sed
 # Adding the PackerResourceGroup, the PackerStorageAccount, the defaultResourceGroup and the defaultKeyVault  
-sudo printf "/subscriptionId:/a\      packerResourceGroup: %s\n      packerStorageAccount: %s\n      defaultResourceGroup: %s\n      defaultKeyVault: %s\n" $PACKERRESOURCEGROUP $PACKERSTORAGEACCOUNT $RESOURCEGROUP $KEYVAULT >> /tmp/sedCommand.sed
+sudo printf "s/packerResourceGroup: %s\n" $PACKERRESOURCEGROUP >> /tmp/sedCommand.sed
+sudo printf "s/packerStorageAccount: %s\n" $PACKERSTORAGEACCOUNT >> /tmp/sedCommand.sed
+sudo printf "s/defaultResourceGroup: %s\n" $RESOURCEGROUP >> /tmp/sedCommand.sed
+sudo printf "defaultKeyVault: %s\n" $KEYVAULT >> /tmp/sedCommand.sed
 sudo printf "sedCommand.sed file created\n" >> /tmp/debug
 
 sudo sed -i -f sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml  
