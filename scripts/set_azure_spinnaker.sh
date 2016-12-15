@@ -43,7 +43,8 @@ sudo printf "Default Resource Group %s \n" $RESOURCEGROUP >> /tmp/helloworld
 sudo printf "Key Vault %s \n" $KEYVAULT >> /tmp/helloworld
 
 # Install Spinnaker on the VM
-sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)"
+printf "azure\nwestus\n" > spinnaker.inputs
+sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < spinnaker.inputs 
 
 # Update and upgrade packages
 sudo apt-get update -y && sudo apt-get upgrade spinnaker -y
@@ -59,7 +60,7 @@ echo 's/subscriptionId:$/& '$SUBSCRIPTIONID'/' >> sedCommand.sed
 # Adding the PackerResourceGroup, the PackerStorageAccount, the defaultResourceGroup and the defaultKeyVault  
 echo '/subscriptionId:/a\      packerResourceGroup: '$PACKERRESOURCEGROUP'\n      packerStorageAccount: '$PACKERSTORAGEACCOUNT'\n      defaultResourceGroup: '$RESOURCEGROUP'\n      defaultKeyVault: '$KEYVAULT'' >> sedCommand.sed
 
-sudo sed -i -f sedCommand.sed /opt/spinnaker/config/default-spinnaker-local.yml  
+sudo sed -i -f sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml  
 
 # Configure rosco.yaml file  
 sudo sed '/^# debianRepository:/s/.*/debianRepository: '$STDDR':'$BINTRAY'/'  /opt/rosco/config/rosco.yml
