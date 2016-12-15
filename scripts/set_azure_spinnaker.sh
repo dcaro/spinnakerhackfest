@@ -30,7 +30,7 @@ done
 
 export BINTRAY='http:\/\/dl.bintray.com\/richardguthrie\/rguthrie-spinnaker_trusty_release'
 export STDDR='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu_trusty_main'
-export WORKDIR=pwd
+export WORKDIR=$(pwd)
 
 # Record the Variables in text file for debugging purposes  
 sudo touch /tmp/helloworld
