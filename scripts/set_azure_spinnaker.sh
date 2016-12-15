@@ -70,7 +70,7 @@ sudo printf "updating spinnaker \n" >> /tmp/debug
 
 sudo printf "Setting up sedCommand \n" >> /tmp/debug
 
-sudo printf "s/enabled: ${SPINNAKER_AZURE_ENABLED:false}/enabled: ${SPINNAKER_AZURE_ENABLED:true}/\n" > /tmp/sedCommand.sed
+sudo printf "s/enabled: \${SPINNAKER_AZURE_ENABLED:false}$/&enabled: \${SPINNAKER_AZURE_ENABLED:true}/\n" > /tmp/sedCommand.sed
 sudo printf "s/clientId:$/& %s/\n" $CLIENTID >> /tmp/sedCommand.sed
 sudo printf "s/appKey:$/& %s/\n" $PASSWORD >> /tmp/sedCommand.sed
 sudo printf "s/tenantId:$/& %s/\n" $TENANTID >> /tmp/sedCommand.sed
@@ -82,7 +82,7 @@ sudo printf "s/defaultResourceGroup:$/& %s/\n" $RESOURCEGROUP >> /tmp/sedCommand
 sudo printf "s/defaultKeyVault:$/& %s/\n" $KEYVAULT >> /tmp/sedCommand.sed
 sudo printf "sedCommand.sed file created\n" >> /tmp/debug
 
-sudo sed -i -f sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml  
+sudo sed -i -f /tmp/sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml  
 
 sudo printf "spinnaker-local.yml file has been updated\n" >> /tmp/debug
 
