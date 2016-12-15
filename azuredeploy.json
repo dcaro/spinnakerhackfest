@@ -2,67 +2,104 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "adminUsername": {
+    "vmSize": {
       "type": "string",
-      "minLength": 1,
+      "allowedValues": [
+        "Standard_A1",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4"
+      ],
       "metadata": {
-        "description": "User name for the Virtual Machine."
+        "description": "Size of vm"
       }
     },
-    "adminPassword": {
+    "username": {
+      "type": "string",
+      "metadata": {
+        "description": "Username for the Virtual Machine."
+      }
+    },
+    "password": {
       "type": "securestring",
       "metadata": {
         "description": "Password for the Virtual Machine."
       }
     },
+    "newStorageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed."
+      }
+    },
     "dnsNameForPublicIP": {
       "type": "string",
-      "minLength": 1,
       "metadata": {
-        "description": "Globally unique DNS Name for the Public IP used to access the Virtual Machine."
+        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
     }
   },
   "variables": {
+    "scenarioPrefix": "spinnaker",
+    "apiVersion": "2015-05-01-preview",
     "imagePublisher": "Canonical",
     "imageOffer": "UbuntuServer",
-    "imagesku" : "14.04.4-LTS",
-    "OSDiskName": "Azure-Spinnaker-01",
-    "nicName": "SpinnakerVMNic",
-    "addressPrefix": "10.0.0.0/16",
-    "subnetName": "Subnet",
-    "subnetPrefix": "10.0.0.0/24",
-    "vhdStorageType": "Standard_LRS",
+    "ubuntuOSVersion": "14.04.2-LTS",
+    "OSDiskName": "[concat(variables('scenarioPrefix'),'OSDisk02')]",
+    "nicName": "[concat(variables('scenarioPrefix'),'Nic')]",
+    "vnetAddressPrefix": "10.0.0.0/20",
+    "subnet0Name": "[concat(variables('scenarioPrefix'),'Subnet0')]",
+    "subnet0Prefix": "10.0.0.0/24",
+    "subnet1Name": "[concat(variables('scenarioPrefix'),'Subnet1')]",
+    "subnet1Prefix": "10.0.1.0/24",
+    "subnet2Name": "[concat(variables('scenarioPrefix'),'Subnet2')]",
+    "subnet2Prefix": "10.0.2.0/24",
+    "storageAccountType": "Standard_LRS",
+    "publicIPAddressName": "[concat(variables('scenarioPrefix'),'PublicIp')]",
     "publicIPAddressType": "Dynamic",
-    "vhdStorageContainerName": "vhds",
-    "vmName": "SpinnakerVM",
-    "vmSize": "Standard_D2_v2",
-    "virtualNetworkName": "MyVNET",
-    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
-    "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]"
+    "vmStorageAccountContainerName": "vhds",
+    "vmName": "[concat(variables('scenarioPrefix'),'VM02')]",
+    "virtualNetworkName": "[concat(variables('scenarioPrefix'),'Vnet')]",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+    "subnet0Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet0Name'))]",
+    "credentials": {
+      "tenantId": "[concat(' -t ','72f988bf-86f1-41af-91ab-2d7cd011db47')]",
+      "subscriptionId": "[concat(' -s ','743f6ed6-83a8-46f0-822d-ea93b953952d')]",
+      "clientId": "[concat(' -c ','9f7062da-70bd-4834-bad0-4f90cb49fea1')]",
+      "clientSecret": "[concat(' -p ','P@ssw0rd!')]"
+    },
+    "packer": {
+      "resourceGroupName": "[concat(' -g ','spinnaker01RG849572')]",
+      "storageAccountName": "[concat(' -h ','golivebakery')]"
+    },
+    "keyVault": {
+      "resourceGroupName": "[concat(' -r ','spinnaker01RG849572')]",
+      "keyVaultName": "[concat(' -k ','goliveSpinnakerVault')]"
+    },
+    "customScript": {
+      "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh",
+      "commandToExecute": "bash set_azure_spinnaker.sh"
+    }
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('vhdStorageName')]",
-      "apiVersion": "2015-06-15",
+      "name": "[parameters('newStorageAccountName')]",
+      "apiVersion": "[variables('apiVersion')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "StorageAccount"
-      },
       "properties": {
-        "accountType": "[variables('vhdStorageType')]"
+        "accountType": "[variables('storageAccountType')]"
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[parameters('dnsNameForPublicIP')]",
+      "name": "[variables('publicIPAddressName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "PublicIPAddress"
-      },
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
         "dnsSettings": {
@@ -71,39 +108,45 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "VirtualNetwork"
-      },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[variables('addressPrefix')]"
+            "[variables('vnetAddressPrefix')]"
           ]
         },
         "subnets": [
           {
-            "name": "[variables('subnetName')]",
+            "name": "[variables('subnet0Name')]",
             "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]"
+              "addressPrefix": "[variables('subnet0Prefix')]"
+            }
+          },
+          {
+            "name": "[variables('subnet1Name')]",
+            "properties": {
+              "addressPrefix": "[variables('subnet1Prefix')]"
+            }
+          },
+          {
+            "name": "[variables('subnet2Name')]",
+            "properties": {
+              "addressPrefix": "[variables('subnet2Prefix')]"
             }
           }
         ]
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('nicName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "NetworkInterface"
-      },
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('dnsNameForPublicIP'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
       "properties": {
@@ -113,10 +156,10 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('dnsNameForPublicIP'))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
               },
               "subnet": {
-                "id": "[variables('subnetRef')]"
+                "id": "[variables('subnet0Ref')]"
               }
             }
           }
@@ -124,37 +167,34 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('vmName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "VirtualMachine"
-      },
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('vmSize')]"
+          "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
           "computerName": "[variables('vmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminUsername": "[parameters('username')]",
+          "adminPassword": "[parameters('password')]"
         },
         "storageProfile": {
           "imageReference": {
             "publisher": "[variables('imagePublisher')]",
             "offer": "[variables('imageOffer')]",
-            "sku": "[variables('imagesku')]",
+            "sku": "[variables('ubuntuOSVersion')]",
             "version": "latest"
           },
           "osDisk": {
-            "name": "[concat(variables('vmName'),'-osdisk')]",
+            "name": "osdisk1",
             "vhd": {
-              "uri": "[concat('https://', variables('vhdStorageName'), '.blob.core.windows.net/', variables('vhdStorageContainerName'), '/', variables('OSDiskName'), '.vhd')]"
+              "uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -163,7 +203,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
             }
           ]
         }
@@ -171,11 +211,11 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('vmName'),'/downloadinitscript')]",
-      "apiVersion": "2015-06-15",
+      "name": "[concat(variables('vmName'),'/installcustomscript')]",
+      "apiVersion": "[variables('apiVersion')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/',variables('vmName'))]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.Extensions",
@@ -183,18 +223,10 @@
         "typeHandlerVersion": "2.0",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "fileUris": [
-            "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh"
-          ],
-          "commandToExecute": "[concat('sh set_azure_spinnaker.sh', ' ', parameters('adminUserName'), ' ', parameters('adminPassword'))]"
+          "fileUris": "[split(variables('customScript').fileUris, ' ')]",
+          "commandToExecute": "[concat(variables('customScript').commandToExecute, variables('credentials').subscriptionId, variables('credentials').tenantId, variables('credentials').clientId, variables('credentials').clientSecret, variables('packer').resourceGroupName, variables('packer').storageAccountName, variables('keyVault').resourceGroupName, variables('keyVault').keyVaultName)]"
         }
       }
     }
-  ],
-  "outputs": {
-    "adminUsername": {
-      "type": "string",
-      "value": "[parameters('adminUsername')]"
-    }
-  }
+  ]
 }
