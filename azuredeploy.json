@@ -68,17 +68,17 @@
     "subnet0Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet0Name'))]",
     "credentials": {
       "tenantId": "[concat(' -t ','72f988bf-86f1-41af-91ab-2d7cd011db47')]",
-      "subscriptionId": "[concat(' -s ','743f6ed6-83a8-46f0-822d-ea93b953952d')]",
-      "clientId": "[concat(' -c ','9f7062da-70bd-4834-bad0-4f90cb49fea1')]",
+      "subscriptionId": "[concat(' -s ','0c3a2f71-4128-4509-8719-3b16f291ad5f')]",
+      "clientId": "[concat(' -c ','9ddd9533-4d4d-4808-a5d7-0de9413b609a')]",
       "clientSecret": "[concat(' -p ','P@ssw0rd!')]"
     },
     "packer": {
-      "resourceGroupName": "[concat(' -g ','spinnaker01RG849572')]",
-      "storageAccountName": "[concat(' -h ','golivebakery')]"
+      "resourceGroupName": "[concat(' -g ','spinnaker-rg')]",
+      "storageAccountName": "[concat(' -h ','spinnakerstore')]"
     },
     "keyVault": {
-      "resourceGroupName": "[concat(' -r ','spinnaker01RG849572')]",
-      "keyVaultName": "[concat(' -k ','goliveSpinnakerVault')]"
+      "resourceGroupName": "[concat(' -r ','spinnaker')]",
+      "keyVaultName": "[concat(' -k ','MySpinnakerVault')]"
     },
     "customScript": {
       "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh",
