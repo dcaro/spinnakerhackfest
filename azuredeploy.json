@@ -41,6 +41,54 @@
       "metadata": {
         "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
+    },
+    "subscriptionId": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Your Azure subscription Id. Used to authenticate future Spinnaker requests against your subscription."
+      }
+    },
+    "clientId": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Client Id of your service principal. Used to authenticate future Spinnaker requests against your subscription."
+      }
+    },
+    "clientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Client Secret of your service principal. Used to authenticate future Spinnaker requests against your subscription. Also known as appKey or password."
+      }
+    },
+    "tenantId": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Your Azure AD Tenant Id. Used to authenticate future Spinnaker requests against your subscription."
+      }
+    },
+    "packerStorageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the storage account into which packer images should go."
+      }
+    },
+    "packerResourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the resource group within which the packer storage account resides."
+      }
+    },
+    "keyVaultResourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the resource group within which the KeyVault account resides."
+      }
+    },
+    "keyVaultAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of your KeyVault account."
+      }
     }
   },
   "variables": {
@@ -67,18 +115,18 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "subnet0Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet0Name'))]",
     "credentials": {
-      "tenantId": "[concat(' -t ','72f988bf-86f1-41af-91ab-2d7cd011db47')]",
-      "subscriptionId": "[concat(' -s ','0c3a2f71-4128-4509-8719-3b16f291ad5f')]",
-      "clientId": "[concat(' -c ','9ddd9533-4d4d-4808-a5d7-0de9413b609a')]",
-      "clientSecret": "[concat(' -p ','P@ssw0rd!')]"
+      "tenantId": "[concat(' -t ', parameters('tenantId')]",
+      "subscriptionId": "[concat(' -s ', parameters('subscriptionId')]",
+      "clientId": "[concat(' -c ', parameters('clientId')]",
+      "clientSecret": "[concat(' -p ', parameters('clientSecret')]"
     },
     "packer": {
-      "resourceGroupName": "[concat(' -g ','spinnaker-rg')]",
-      "storageAccountName": "[concat(' -h ','spinnakerstore')]"
+      "resourceGroupName": "[concat(' -g ', parameters('packerResourceGroupName')]",
+      "storageAccountName": "[concat(' -h ', parameters('packerStorageAccountName')]"
     },
     "keyVault": {
-      "resourceGroupName": "[concat(' -r ','spinnaker')]",
-      "keyVaultName": "[concat(' -k ','MySpinnakerVault')]"
+      "resourceGroupName": "[concat(' -r ', parameters('keyVaultResourceGroupName')]",
+      "keyVaultName": "[concat(' -k ', parameters('keyVaultAccountName')]"
     },
     "customScript": {
       "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh",

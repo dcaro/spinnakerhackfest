@@ -3,19 +3,56 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "username": {
-      "value": "greg"
+      "type":"string",
+      "value": "your-linux-admin-userid"
     },
     "password": {
-      "value": "P@ssw0rd!"
+      "type":"string",
+      "value": "your-linux-admin-password"
     },
     "newStorageAccountName": {
-      "value": "dcarospinnaker1"
+      "type":"string",
+      "value": "your-vhd-storage-account-name"
     },
     "vmSize": {
+      "type":"string",
       "value": "Standard_D2"
     },
     "dnsNameForPublicIP": {
-      "value": "dcarospinnaker1"
+      "type":"string",
+      "value": "your-dns-prefix"
+    },
+    "subscriptionId": {
+      "type": "securestring",
+      "value": "your-subscription-Id"
+    },
+    "clientId": {
+      "type": "securestring",
+      "value": "your-client-Id"
+    },
+    "clientSecret": {
+      "type": "securestring",
+      "value": "your-client-secret"
+    },
+    "tenantId": {
+      "type": "securestring",
+      "value": "your-tenant-Id"
+    },
+    "packerStorageAccountName": {
+      "type":"string",
+      "value": "your-packer-storage-account-name"
+    },
+    "packerResourceGroupName": {
+      "type":"string",
+      "value": "your-packer-resource-group-name"
+    },
+    "keyVaultResourceGroupName": {
+      "type":"string",
+      "value": "your-keyvault-resource-group-name"
+    },
+    "keyVaultAccountName": {
+      "type":"string",
+      "value": "your-keyvault-account-name"
     }
   }
 }
