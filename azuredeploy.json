@@ -78,12 +78,6 @@
         "description": "Name of the resource group within which the packer storage account resides."
       }
     },
-    "keyVaultResourceGroupName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the resource group within which the KeyVault account resides."
-      }
-    },
     "keyVaultAccountName": {
       "type": "string",
       "metadata": {
@@ -97,7 +91,7 @@
     "imagePublisher": "Canonical",
     "imageOffer": "UbuntuServer",
     "ubuntuOSVersion": "14.04.2-LTS",
-    "OSDiskName": "[concat(variables('scenarioPrefix'),'OSDisk02')]",
+    "OSDiskName": "[concat(variables('scenarioPrefix'),'OSDisk')]",
     "nicName": "[concat(variables('scenarioPrefix'),'Nic')]",
     "vnetAddressPrefix": "10.0.0.0/20",
     "subnet0Name": "[concat(variables('scenarioPrefix'),'Subnet0')]",
@@ -110,7 +104,7 @@
     "publicIPAddressName": "[concat(variables('scenarioPrefix'),'PublicIp')]",
     "publicIPAddressType": "Dynamic",
     "vmStorageAccountContainerName": "vhds",
-    "vmName": "[concat(variables('scenarioPrefix'),'VM02')]",
+    "vmName": "[concat(variables('scenarioPrefix'),'VM')]",
     "virtualNetworkName": "[concat(variables('scenarioPrefix'),'Vnet')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "subnet0Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet0Name'))]",
@@ -125,7 +119,7 @@
       "storageAccountName": "[concat(' -h ', parameters('packerStorageAccountName'))]"
     },
     "keyVault": {
-      "resourceGroupName": "[concat(' -r ', parameters('keyVaultResourceGroupName'))]",
+      "resourceGroupName": "[concat(' -r ', resourceGroup().name)]",
       "keyVaultName": "[concat(' -k ', parameters('keyVaultAccountName'))]"
     },
     "customScript": {
