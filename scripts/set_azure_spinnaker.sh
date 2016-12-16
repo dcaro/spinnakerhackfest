@@ -61,9 +61,11 @@ sudo printf "azure\nwestus\n" > /tmp/spinnaker.inputs
 sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < /tmp/spinnaker.inputs 
 sudo printf "Spinnaked has been installed\n" >> /tmp/debug
 
+sudo apt-mark hold waagent
 sudo apt-get update -y
 sudo apt-get upgrade spinnaker -y
 sudo printf "updating spinnaker \n" >> /tmp/debug
+sudo apt-mark unhold waagent
 
 # Configuring the /opt/spinnaker/config/default-spinnaker-local.yml
 # Let's create the sed command file and run the sed command
