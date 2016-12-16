@@ -70,7 +70,7 @@ sudo printf "updating spinnaker \n" >> /tmp/debug
 
 sudo printf "Setting up sedCommand \n" >> /tmp/debug
 
-sudo printf "s/enabled: \${SPINNAKER_AZURE_ENABLED:false}$/&enabled: \${SPINNAKER_AZURE_ENABLED:true}/\n" > /tmp/sedCommand.sed
+sudo printf "s/enabled: ${SPINNAKER_AZURE_ENABLED:false}/enabled: ${SPINNAKER_AZURE_ENABLED:true}/g\n" > /tmp/sedCommand.sed
 sudo printf "s/clientId:$/& %s/\n" $CLIENTID >> /tmp/sedCommand.sed
 sudo printf "s/appKey:$/& %s/\n" $PASSWORD >> /tmp/sedCommand.sed
 sudo printf "s/tenantId:$/& %s/\n" $TENANTID >> /tmp/sedCommand.sed
@@ -87,7 +87,7 @@ sudo sed -i -f /tmp/sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml
 sudo printf "spinnaker-local.yml file has been updated\n" >> /tmp/debug
 
 # Configure rosco.yaml file  
-sudo sed '/^# debianRepository:/s/.*/debianRepository: '$STDDR':'$BINTRAY'/'  /opt/rosco/config/rosco.yml
-sudo sed '/defaultCloudProviderType/s/.*/defaultCloudProviderType: azure/' /opt/rosco/config/rosco.yml
+sudo sed -i '/^# debianRepository:/s/.*/debianRepository: '$STDDR':'$BINTRAY'/' /opt/rosco/config/rosco.yml
+sudo sed -i '/defaultCloudProviderType/s/.*/defaultCloudProviderType: azure/' /opt/rosco/config/rosco.yml
 
 sudo printf "rosco.yml file has been updated\n" >> /tmp/debug
