@@ -104,7 +104,15 @@ sudo printf "sedCommand.sed file created\n" >> /tmp/debug
 sudo sed -i -f /tmp/sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml 
 sudo printf "spinnaker-local.yml file has been updated\n" >> /tmp/debug
 
-# Configure rosco.yaml file  
+# Configure rosco.yml file  
 sudo sed -i '/^# debianRepository:/s/.*/debianRepository: '$STDDR':'$BINTRAY'/' /opt/rosco/config/rosco.yml
 sudo sed -i '/defaultCloudProviderType/s/.*/defaultCloudProviderType: azure/' /opt/rosco/config/rosco.yml
 sudo printf "rosco.yml file has been updated\n" >> /tmp/debug
+
+# Adding apt-key key
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB9B1D8886F44E2A
+sudo printf "apt-key done\n" >> /tmp/debug
+
+# rebooting the VM to avoid issues with front50
+sudo printf "Rebooting the system after installation\n" >> /tmp/debug
+sudo shutdown -r now "Rebooting the system after Spinnaker installation"
