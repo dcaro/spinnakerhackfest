@@ -31,6 +31,9 @@ done
 export BINTRAY='http:\/\/dl.bintray.com\/richardguthrie\/rguthrie-spinnaker_trusty_release'
 export STDDR='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu_trusty_main'
 export WORKDIR=$(pwd)
+export JENKINS_URL='http:\/\/myjenkins.westus.azure.com:8080'
+export JENKINS_USERNAME='jenkins'
+export JENKINS_PASSWORD='P@ssw0rd'
 
 # Record the Variables in text file for debugging purposes  
 sudo touch /tmp/helloworld
@@ -46,14 +49,16 @@ sudo printf "KEYVAULT=%s\n" $KEYVAULT >> /tmp/helloworld
 sudo touch /tmp/debug
 sudo printf "working directory is %s\n" $WORKDIR >> /tmp/debug
 
-sudo printf "Upgrading the environment \n" >> /tmp/debug
+sudo printf "Upgrading the environment\n" >> /tmp/debug
 # Update and upgrade packages
 sudo rm /var/lib/dpkg/updates/*
-sudo printf "directory /var/lib/dpkg/updates removed \n" >> /tmp/debug
+sudo printf "directory /var/lib/dpkg/updates removed\n" >> /tmp/debug
+sudo apt-mark hold waagent
+sudo printf "Holding waagent\n" >> /tmp/debug
 sudo apt-get update -y
-sudo printf "apt-get update completed \n" >> /tmp/debug
-# sudo apt-get upgrade -y
-# sudo printf "apt-get upgrade completed \n" >> /tmp/debug
+sudo printf "apt-get update completed\n" >> /tmp/debug
+sudo apt-get upgrade -y
+ sudo printf "apt-get upgrade completed\n" >> /tmp/debug
 
 # Install Spinnaker on the VM
 sudo printf "Starting to install Spinnaker\n" >> /tmp/debug
@@ -61,11 +66,12 @@ sudo printf "azure\nwestus\n" > /tmp/spinnaker.inputs
 sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < /tmp/spinnaker.inputs 
 sudo printf "Spinnaked has been installed\n" >> /tmp/debug
 
-sudo apt-mark hold waagent
-sudo apt-get update -y
-sudo apt-get upgrade spinnaker -y
-sudo printf "updating spinnaker \n" >> /tmp/debug
-sudo apt-mark unhold waagent
+# Refresh Spinnaker installation
+# sudo apt-mark hold waagent
+# sudo apt-get update -y
+# sudo apt-get upgrade spinnaker -y
+# sudo printf "updating spinnaker \n" >> /tmp/debug
+# sudo apt-mark unhold waagent
 
 # Configuring the /opt/spinnaker/config/default-spinnaker-local.yml
 # Let's create the sed command file and run the sed command
@@ -82,14 +88,23 @@ sudo printf "s/packerResourceGroup:$/& %s/\n" $PACKERRESOURCEGROUP >> /tmp/sedCo
 sudo printf "s/packerStorageAccount:$/& %s/\n" $PACKERSTORAGEACCOUNT >> /tmp/sedCommand.sed
 sudo printf "s/defaultResourceGroup:$/& %s/\n" $RESOURCEGROUP >> /tmp/sedCommand.sed
 sudo printf "s/defaultKeyVault:$/& %s/\n" $KEYVAULT >> /tmp/sedCommand.sed
+
+# Enable Igor for the integration with Jenkins
+sudo printf "/igor:/ {\n           N\n           N\n           N\n           /enabled:/ {\n             s/enabled:.*/enabled: true/\n             P\n             D\n         }\n}\n" >> /tmp/sedCommand.sed
+
+# Configure the Jenkins instance
+sudo printf "/name: Jenkins.*/ {\n N\n /baseUrl:/ { s/baseUrl:.*/baseUrl: %s/ }\n" $JENKINS_URL >> /tmp/sedCommand.sed
+sudo printf " N\n /username:/ { s/username:/username: %s/ }\n" $JENKINS_USERNAME >> /tmp/sedCommand.sed
+sudo printf " N\n /password:/ { s/password:/password: %s/ }\n" $JENKINS_PASSWORD >> /tmp/sedCommand.sed
+sudo printf "}" >> /tmp/sedCommand.sed
+
 sudo printf "sedCommand.sed file created\n" >> /tmp/debug
 
-sudo sed -i -f /tmp/sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml  
-
+# Set the variables in the spinnaker-local.yml file
+sudo sed -i -f /tmp/sedCommand.sed /opt/spinnaker/config/spinnaker-local.yml 
 sudo printf "spinnaker-local.yml file has been updated\n" >> /tmp/debug
 
 # Configure rosco.yaml file  
 sudo sed -i '/^# debianRepository:/s/.*/debianRepository: '$STDDR':'$BINTRAY'/' /opt/rosco/config/rosco.yml
 sudo sed -i '/defaultCloudProviderType/s/.*/defaultCloudProviderType: azure/' /opt/rosco/config/rosco.yml
-
 sudo printf "rosco.yml file has been updated\n" >> /tmp/debug
