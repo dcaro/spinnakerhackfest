@@ -51,12 +51,12 @@ sudo printf "working directory is %s\n" $WORKDIR >> /tmp/debug
 
 sudo printf "Upgrading the environment\n" >> /tmp/debug
 # Update and upgrade packages
-sudo rm /var/lib/dpkg/updates/*
-sudo printf "directory /var/lib/dpkg/updates removed\n" >> /tmp/debug
-sudo apt-mark hold walinuxagent
-sudo printf "Holding waagent\n" >> /tmp/debug
+sudo apt-mark hold walinuxagent grub-legacy-ec2
+sudo printf "Holding walinuxagent\n" >> /tmp/debug
 sudo apt-get update -y
 sudo printf "apt-get update completed\n" >> /tmp/debug
+sudo rm /var/lib/dpkg/updates/*
+sudo printf "directory /var/lib/dpkg/updates removed\n" >> /tmp/debug
 sudo apt-get upgrade -y
 sudo printf "apt-get upgrade completed\n" >> /tmp/debug
 
