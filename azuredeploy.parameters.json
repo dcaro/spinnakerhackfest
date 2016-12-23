@@ -11,7 +11,7 @@
     "newStorageAccountName": {
       "value": "your-vhd-storage-account-name"
     },
-    "vmSize": {
+    "SpinnakerVMSize": {
       "value": "Standard_D2"
     },
     "dnsNameForPublicIP": {
@@ -34,9 +34,6 @@
     },
     "packerResourceGroupName": {
       "value": "your-packer-resource-group-name"
-    },
-    "keyVaultResourceGroupName": {
-      "value": "your-keyvault-resource-group-name"
     },
     "keyVaultAccountName": {
       "value": "your-keyvault-account-name"

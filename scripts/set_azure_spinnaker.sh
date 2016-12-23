@@ -53,12 +53,12 @@ sudo printf "Upgrading the environment\n" >> /tmp/debug
 # Update and upgrade packages
 sudo rm /var/lib/dpkg/updates/*
 sudo printf "directory /var/lib/dpkg/updates removed\n" >> /tmp/debug
-sudo apt-mark hold waagent
+sudo apt-mark hold walinuxagent
 sudo printf "Holding waagent\n" >> /tmp/debug
 sudo apt-get update -y
 sudo printf "apt-get update completed\n" >> /tmp/debug
 sudo apt-get upgrade -y
- sudo printf "apt-get upgrade completed\n" >> /tmp/debug
+sudo printf "apt-get upgrade completed\n" >> /tmp/debug
 
 # Install Spinnaker on the VM
 sudo printf "Starting to install Spinnaker\n" >> /tmp/debug
