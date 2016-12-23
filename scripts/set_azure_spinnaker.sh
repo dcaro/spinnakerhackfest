@@ -38,6 +38,7 @@ WORKDIR=$(pwd)
 # Usually the workdir is /var/lib/waagent/custom-script/download/0
 DEBUG_FILE=$WORDIR"/debugfile"
 SED_FILE=$WORKDIR"/sedCommand.sed"
+SPINNAKER_ENTRY=$WORKDIR"/spinnaker.inputs"
 BINTRAY='http:\/\/dl.bintray.com\/richardguthrie\/rguthrie-spinnaker_trusty_release'
 STDDR='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu_trusty_main'
 
@@ -72,16 +73,9 @@ sudo printf "apt-get upgrade completed\n" >> $DEBUG_FILE
 
 # Install Spinnaker on the VM
 sudo printf "Starting to install Spinnaker\n" >> $DEBUG_FILE
-sudo printf "azure\nwestus\n" > /tmp/spinnaker.inputs
-sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < /tmp/spinnaker.inputs 
+sudo printf "azure\nwestus\n" > $SPINNAKER_ENTRY
+sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < $SPINNAKER_ENTRY 
 sudo printf "Spinnaked has been installed\n" >> $DEBUG_FILE
-
-# Refresh Spinnaker installation
-# sudo apt-mark hold waagent
-# sudo apt-get update -y
-# sudo apt-get upgrade spinnaker -y
-# sudo printf "updating spinnaker \n" >> $DEBUG_FILE
-# sudo apt-mark unhold waagent
 
 # Configuring the /opt/spinnaker/config/default-spinnaker-local.yml
 # Let's create the sed command file and run the sed command
