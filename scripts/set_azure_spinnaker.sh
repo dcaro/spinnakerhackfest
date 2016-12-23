@@ -47,7 +47,6 @@ JENKINS_USERNAME='jenkins'
 JENKINS_PASSWORD='P@ssw0rd'
 
 # Record the Variables in text file for debugging purposes  
-sudo touch $DEBUG_FILE
 sudo printf "TENANTID=%s\n" $TENANTID > $DEBUG_FILE
 sudo printf "PASSWORD=%s\n" $PASSWORD >> $DEBUG_FILE
 sudo printf "CLIENTID=%s\n" $CLIENTID >> $DEBUG_FILE
