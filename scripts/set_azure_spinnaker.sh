@@ -34,11 +34,13 @@ while getopts ":t:s:p:c:g:h:r:k:b:j:u:q:" opt; do
   esac
 done
 
-DEBUG_FILE="/tmp/debugfile"
-SED_FILE="$SED_FILE"
+WORKDIR=$(pwd)
+# Usually the workdir is /var/lib/waagent/custom-script/download/0
+DEBUG_FILE=$WORDIR"/debugfile"
+SED_FILE=$WORKDIR"/sedCommand.sed"
 BINTRAY='http:\/\/dl.bintray.com\/richardguthrie\/rguthrie-spinnaker_trusty_release'
 STDDR='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu_trusty_main'
-WORKDIR=$(pwd)
+
 JENKINS_URL='http:\/\/myjenkins.westus.azure.com:8080'
 JENKINS_USERNAME='jenkins'
 JENKINS_PASSWORD='P@ssw0rd'
