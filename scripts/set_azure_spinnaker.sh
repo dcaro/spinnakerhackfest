@@ -36,7 +36,7 @@ done
 
 WORKDIR=$(pwd)
 # Usually the workdir is /var/lib/waagent/custom-script/download/0
-DEBUG_FILE=$WORDIR"/debugfile"
+DEBUG_FILE=$WORKDIR"/debugfile"
 SED_FILE=$WORKDIR"/sedCommand.sed"
 SPINNAKER_ENTRY=$WORKDIR"/spinnaker.inputs"
 BINTRAY='http:\/\/dl.bintray.com\/richardguthrie\/rguthrie-spinnaker_trusty_release'
@@ -119,5 +119,5 @@ sudo printf "apt-key done\n" >> $DEBUG_FILE
 
 # rebooting the VM to avoid issues with front50
 sudo printf "Rebooting the system after installation\n" >> $DEBUG_FILE
-sudo shutdown -r +2 "Rebooting the system after Spinnaker installation" &
+sudo shutdown -r now "Rebooting the system after Spinnaker installation" 
 
