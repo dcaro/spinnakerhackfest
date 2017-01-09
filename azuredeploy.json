@@ -90,6 +90,20 @@
     }
   },
   "variables": {
+    "VM": [{
+      "name": "Jenkins",
+      "publisher": "MicrosoftVisualStudio",
+      "offer": "VisualStudio",
+      "sku": "Azure-Jenkins-012",
+      "version": "latest"
+     }, 
+     {
+       "name": "Spinnaker",
+       "publisher": "Canonical",
+       "offer": "UbuntuServer",
+       "sku": "14.04.2-LTS",
+       "version": "latest"
+      }],
     "scenarioPrefix": "spinnaker",
     "apiVersion": "2015-05-01-preview",
     "imagePublisher": "Canonical",
@@ -126,9 +140,17 @@
       "resourceGroupName": "[concat(' -r ', resourceGroup().name)]",
       "keyVaultName": "[concat(' -k ', parameters('keyVaultAccountName'))]"
     },
-    "customScript": {
+    "SpinnakerCustomScript": {
       "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh",
       "commandToExecute": "bash set_azure_spinnaker.sh"
+    },
+    "JenkinsCredentials": {
+      "adminUsername": "jenkins",
+      "adminPassword": "Passw0rd"
+    },
+    "JenkinsCustomScript": {
+      "fileUris": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/azure-jenkins/scripts/set_azure_jenkins.sh",
+      "commandToExecute": "bash set_azure_jenkins.sh"     
     }
   },
   "resources": [
@@ -198,12 +220,16 @@
     {
       "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIPAddressName')]",
+      "name": "[concat(variables('publicIPAddressName'), copyIndex())]",
       "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "publicip",
+        "count": 2
+      },
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
         "dnsSettings": {
-          "domainNameLabel": "[parameters('dnsNameForPublicIP')]"
+          "domainNameLabel": "[concat(parameters('dnsNameForPublicIP'), copyIndex())]"
         }
       }
     },
@@ -243,10 +269,10 @@
     {
       "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(variables('nicName'), '-', copyIndex())]",
+      "name": "[concat(variables('nicName'), copyIndex())]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', concat(variables('publicIPAddressName'),copyIndex()))]",
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
       "copy": {
@@ -258,9 +284,10 @@
           {
             "name": "ipconfig1",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[concat('10.0.0.', copyIndex(4))]",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIPAddressName'),copyIndex()))]"
               },
               "subnet": {
                 "id": "[variables('subnet0Ref')]"
@@ -273,11 +300,11 @@
     {
       "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(variables('vmName'), '-', copyIndex())]",
+      "name": "[concat(variables('vmName'), copyIndex())]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyIndex())]"
       ],
       "copy":{
         "name": "vmcopy",
@@ -294,9 +321,9 @@
         },
         "storageProfile": {
           "imageReference": {
-            "publisher": "[variables('imagePublisher')]",
-            "offer": "[variables('imageOffer')]",
-            "sku": "[variables('ubuntuOSVersion')]",
+            "publisher": "[variables('VM')[copyIndex()].publisher]",
+            "offer": "[variables('VM')[copyIndex()].offer]",
+            "sku": "[variables('VM')[copyIndex()].sku]",
             "version": "latest"
           },
           "osDisk": {
@@ -311,7 +338,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicName'), copyIndex()))]"
             }
           ]
         }
@@ -319,11 +346,11 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('vmName'),'-2','/installcustomscript')]",
+      "name": "[concat(variables('vmName'),'1','/SpinnakerCustomScript')]",
       "apiVersion": "[variables('apiVersion')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '1')]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.Extensions",
@@ -331,8 +358,27 @@
         "typeHandlerVersion": "2.0",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "fileUris": "[split(variables('customScript').fileUris, ' ')]",
-          "commandToExecute": "[concat(variables('customScript').commandToExecute, variables('credentials').subscriptionId, variables('credentials').tenantId, variables('credentials').clientId, variables('credentials').clientSecret, variables('packer').resourceGroupName, variables('packer').storageAccountName, variables('keyVault').resourceGroupName, variables('keyVault').keyVaultName)]"
+          "fileUris": "[split(variables('SpinnakerCustomScript').fileUris, ' ')]",
+          "commandToExecute": "[concat(variables('SpinnakerCustomScript').commandToExecute, variables('credentials').subscriptionId, variables('credentials').tenantId, variables('credentials').clientId, variables('credentials').clientSecret, variables('packer').resourceGroupName, variables('packer').storageAccountName, variables('keyVault').resourceGroupName, variables('keyVault').keyVaultName)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('vmName'),'0','/JenkinsCustomScript')]",
+      "apiVersion": "[variables('apiVersion')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '0')]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": "[split(variables('JenkinsCustomScript').fileUris, ' ')]",
+          "commandToExecute": "[concat(variables('JenkinsCustomScript').commandToExecute, ' ', variables('JenkinsCredentials').adminUserName, ' ', variables('JenkinsCredentials').adminPassword)]"
         }
       }
     }
