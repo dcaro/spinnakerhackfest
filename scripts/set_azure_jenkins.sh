@@ -5,7 +5,9 @@ CONFIG_AZURE_SCRIPT="config_azure.sh"
 CLEAN_STORAGE_SCRIPT="clear_storage_config.sh"
 CREATE_STORAGE_SCRIPT="config_azure_jenkins_storage.sh"
 CREATE_SERVICE_PRINCIPAL_SCRIPT="create_service_principal.sh"
-SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
+INITIAL_JENKINS_CONFIG="init_jenkins.sh"
+#SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
+SOURCE_URI="https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/setup-scripts/"
 
 #delete any previous user if there is any
 if [ ! -d $JENKINS_USER ]
@@ -34,6 +36,10 @@ sudo chmod +x $SETUP_SCRIPTS_LOCATION$CREATE_STORAGE_SCRIPT
 # Download create_service_principal script
 sudo wget -O $SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT $SOURCE_URI$CREATE_SERVICE_PRINCIPAL_SCRIPT
 sudo chmod +x $SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT
+
+# Download init_jenkins config script
+sudo wget -O SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT $SOURCE_URI$INITIAL_JENKINS_CONFIG
+sudo chmod+x $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
 
 #delete any existing config script
 old_config_storage_file="/opt/azure_jenkins_config/config_storage.sh"
