@@ -2,6 +2,6 @@
     "itemDisplayName": "Deploy instance of Jenkins targeting Azure Platform",
     "description": "This template will deploy an instance of the Jenkins CI tool configured to target the Azure platform onto a Linux VM in Azure and ",
     "summary": "Create a new Linux Ubuntu 14.04 LTS VM with Jenkins, Azure CLI installed to target Azure",
-    "githubUsername": "dcaro",
-    "dateUpdated": "2016-12-14"
+    "githubUsername": "sebastus",
+    "dateUpdated": "2016-01-11"
 }

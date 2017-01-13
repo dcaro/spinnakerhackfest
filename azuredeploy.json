@@ -1,386 +1,208 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "SpinnakerVMSize": {
-      "type": "string",
-      "allowedValues": [
-        "Standard_A1",
-        "Standard_A2",
-        "Standard_A3",
-        "Standard_A4",
-        "Standard_D1",
-        "Standard_D2",
-        "Standard_D3",
-        "Standard_D4",
-        "Standard_DS12_v2",
-        "Standard_DS11_v2"
-      ],
-      "metadata": {
-        "description": "Size of vm"
-      },
-      "defaultValue": "Standard_DS12_v2"
-    },
-    "username": {
-      "type": "string",
-      "metadata": {
-        "description": "Username for the Virtual Machine."
-      },
-      "defaultValue": "azureuser"
-    },
-    "password": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Password for the Virtual Machine."
-      }
-    },
-    "newStorageAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed."
-      }
-    },
-    "dnsNameForPublicIP": {
-      "type": "string",
-      "metadata": {
-        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
-      }
-    },
-    "subscriptionId": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Your Azure subscription Id. Used to authenticate future Spinnaker requests against your subscription."
-      }
-    },
-    "clientId": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Client Id of your service principal. Used to authenticate future Spinnaker requests against your subscription."
-      }
-    },
-    "clientSecret": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Client Secret of your service principal. Used to authenticate future Spinnaker requests against your subscription. Also known as appKey or password."
-      }
-    },
-    "tenantId": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Your Azure AD Tenant Id. Used to authenticate future Spinnaker requests against your subscription."
-      }
-    },
-    "packerStorageAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the storage account into which packer images should go."
-      }
-    },
-    "packerResourceGroupName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the resource group within which the packer storage account resides."
-      }
-    },
-    "keyVaultAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of your KeyVault account."
-      }
-    }
-  },
-  "variables": {
-    "VM": [{
-      "name": "Jenkins",
-      "publisher": "MicrosoftVisualStudio",
-      "offer": "VisualStudio",
-      "sku": "Azure-Jenkins-012",
-      "version": "latest"
-     }, 
-     {
-       "name": "Spinnaker",
-       "publisher": "Canonical",
-       "offer": "UbuntuServer",
-       "sku": "14.04.2-LTS",
-       "version": "latest"
-      }],
-    "scenarioPrefix": "spinnaker",
-    "apiVersion": "2015-05-01-preview",
-    "imagePublisher": "Canonical",
-    "imageOffer": "UbuntuServer",
-    "ubuntuOSVersion": "14.04.2-LTS",
-    "OSDiskName": "[concat(variables('scenarioPrefix'),'OSDisk')]",
-    "nicName": "[concat(variables('scenarioPrefix'),'Nic')]",
-    "vnetAddressPrefix": "10.0.0.0/20",
-    "subnet0Name": "[concat(variables('scenarioPrefix'),'Subnet0')]",
-    "subnet0Prefix": "10.0.0.0/24",
-    "subnet1Name": "[concat(variables('scenarioPrefix'),'Subnet1')]",
-    "subnet1Prefix": "10.0.1.0/24",
-    "subnet2Name": "[concat(variables('scenarioPrefix'),'Subnet2')]",
-    "subnet2Prefix": "10.0.2.0/24",
-    "storageAccountType": "Standard_LRS",
-    "publicIPAddressName": "[concat(variables('scenarioPrefix'),'PublicIp')]",
-    "publicIPAddressType": "Dynamic",
-    "vmStorageAccountContainerName": "vhds",
-    "vmName": "[concat(variables('scenarioPrefix'),'VM')]",
-    "virtualNetworkName": "[concat(variables('scenarioPrefix'),'Vnet')]",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
-    "subnet0Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet0Name'))]",
-    "credentials": {
-      "tenantId": "[concat(' -t ', parameters('tenantId'))]",
-      "subscriptionId": "[concat(' -s ', parameters('subscriptionId'))]",
-      "clientId": "[concat(' -c ', parameters('clientId'))]",
-      "clientSecret": "[concat(' -p ', parameters('clientSecret'))]"
-    },
-    "packer": {
-      "resourceGroupName": "[concat(' -g ', parameters('packerResourceGroupName'))]",
-      "storageAccountName": "[concat(' -h ', parameters('packerStorageAccountName'))]"
-    },
-    "keyVault": {
-      "resourceGroupName": "[concat(' -r ', resourceGroup().name)]",
-      "keyVaultName": "[concat(' -k ', parameters('keyVaultAccountName'))]"
-    },
-    "SpinnakerCustomScript": {
-      "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh",
-      "commandToExecute": "bash set_azure_spinnaker.sh"
-    },
-    "JenkinsCredentials": {
-      "adminUsername": "jenkins",
-      "adminPassword": "Passw0rd"
-    },
-    "JenkinsCustomScript": {
-      "fileUris": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/azure-jenkins/scripts/set_azure_jenkins.sh",
-      "commandToExecute": "bash set_azure_jenkins.sh"     
-    }
-  },
-  "resources": [
-    {
-      "type": "Microsoft.KeyVault/vaults",
-      "apiVersion": "2015-06-01",
-      "name": "[parameters('keyVaultAccountName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "enabledForDeployment": true,
-        "enabledForTemplateDeployment": true,
-        "enabledForVolumeEncryption": true,
-        "tenantId": "[parameters('tenantId')]",
-        "accessPolicies": [
-          {
-            "tenantId": "[parameters('tenantId')]",
-            "objectId": "[parameters('clientId')]",
-            "permissions": {
-              "keys": [
-                "all"
-              ],
-              "secrets": [
-                "get"
-              ]
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceIndex": {
+            "type": "string",
+            "metadata": {
+                "description": "An index to append to certain resource names to avoid collisions during testing."
             }
-          }
-        ],
-        "sku": {
-          "name": "standard",
-          "family": "A"
+        },
+        "vmUserName": {
+            "type": "string",
+            "metadata": {
+                "description": "Login user name for the spinnaker VM."
+            }
+        },
+        "vmPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Login password for the spinnaker VM."
+            }
+        },
+        "spnClientId": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Client ID of the Azure AD application that has rights to spinnaker."
+            }
+        },
+        "spnTenantId": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Tenant ID of the Azure AD application that has rights to spinnaker."
+            }
+        },
+        "templateLocation": {
+            "type": "string",
+            "defaultValue": "https://golivearmstorage.blob.core.windows.net/spinnaker-jenkins",
+            "metadata": {
+                "description": "Template file location",
+                "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
+            }
+        },
+        "packerResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource Group containing Packer."
+            }
+        },
+        "packerStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Storage account holding Packer assets."
+            }
         }
-      },
-      "resources": [
+    },
+    "variables": {
+        "scenarioPrefix": "spinnaker",
+        "templateAPIVersion": "2016-09-01",
+        "templateBaseUrl": "[concat(parameters('templateLocation'), '/')]",
+        "storageAccountName": "[concat('golivespinvhds', parameters('resourceIndex'))]",
+        "storageAccountContainerName": "vhds",
+        "spinnakerTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'spinnakerDeploy.json')]",
+        "storageTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'storageDeploy.json')]",
+        "vnetTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'vnetDeploy.json')]",
+        "jenkinsTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'jenkinsDeploy.json')]",
+        "vnetName": "[concat(variables('scenarioPrefix'),'Vnet')]",
+        "subnet0Name": "[concat(variables('scenarioPrefix'),'Subnet0')]",
+        "subnet1Name": "[concat(variables('scenarioPrefix'),'Subnet1')]",
+        "subnet2Name": "[concat(variables('scenarioPrefix'),'Subnet2')]",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+        "subnet0Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet0Name'))]"
+    },
+    "resources": [
         {
-          "type": "secrets",
-          "name": "VMUsername",
-          "apiVersion": "2015-06-01",
-          "properties": {
-            "value": "[parameters('username')]"
-          },
-          "dependsOn": [
-            "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultAccountName'))]"
-          ]
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "storage-deployment",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('storageTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "StorageAccount": {
+                        "value": {
+                            "name": "[variables('storageAccountName')]",
+                            "type": "Standard_LRS"
+                        }
+                    }
+                }
+            }
         },
         {
-          "type": "secrets",
-          "name": "VMPassword",
-          "apiVersion": "2015-06-01",
-          "properties": {
-            "value": "[parameters('password')]"
-          },
-          "dependsOn": [
-            "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultAccountName'))]"
-          ]
-        }
-      ]
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('newStorageAccountName')]",
-      "apiVersion": "[variables('apiVersion')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "accountType": "[variables('storageAccountType')]"
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(variables('publicIPAddressName'), copyIndex())]",
-      "location": "[resourceGroup().location]",
-      "copy": {
-        "name": "publicip",
-        "count": 2
-      },
-      "properties": {
-        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-        "dnsSettings": {
-          "domainNameLabel": "[concat(parameters('dnsNameForPublicIP'), copyIndex())]"
-        }
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[variables('virtualNetworkName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('vnetAddressPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('subnet0Name')]",
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "vnet-deployment",
             "properties": {
-              "addressPrefix": "[variables('subnet0Prefix')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "VirtualNetwork": {
+                        "value": {
+                            "name": "[variables('vnetName')]",
+                            "addressSpace": "10.0.0.0/20",
+                            "subnet0Name": "[variables('subnet0Name')]",
+                            "subnet1Name": "[variables('subnet1Name')]",
+                            "subnet2Name": "[variables('subnet2Name')]",
+                            "subnet0AddressPrefix": "10.0.0.0/24",
+                            "subnet1AddressPrefix": "10.0.1.0/24",
+                            "subnet2AddressPrefix": "10.0.2.0/24"
+                        }
+                    }
+                }
             }
-          },
-          {
-            "name": "[variables('subnet1Name')]",
-            "properties": {
-              "addressPrefix": "[variables('subnet1Prefix')]"
-            }
-          },
-          {
-            "name": "[variables('subnet2Name')]",
-            "properties": {
-              "addressPrefix": "[variables('subnet2Prefix')]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(variables('nicName'), copyIndex())]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', concat(variables('publicIPAddressName'),copyIndex()))]",
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
-      ],
-      "copy": {
-        "name": "VMNic",
-        "count": 2
-      },
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat('10.0.0.', copyIndex(4))]",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIPAddressName'),copyIndex()))]"
-              },
-              "subnet": {
-                "id": "[variables('subnet0Ref')]"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(variables('vmName'), copyIndex())]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyIndex())]"
-      ],
-      "copy":{
-        "name": "vmcopy",
-        "count": 2
-      },
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[parameters('SpinnakerVMSize')]"
         },
-        "osProfile": {
-          "computerName": "[variables('vmName')]",
-          "adminUsername": "[parameters('username')]",
-          "adminPassword": "[parameters('password')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('VM')[copyIndex()].publisher]",
-            "offer": "[variables('VM')[copyIndex()].offer]",
-            "sku": "[variables('VM')[copyIndex()].sku]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "[concat('osdisk',copyIndex())]",
-            "vhd": {
-              "uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),copyIndex(),'.vhd')]"
-            },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicName'), copyIndex()))]"
+        {
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "spinnaker-deployment",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/storage-deployment",
+                "Microsoft.Resources/deployments/vnet-deployment"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('spinnakerTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "SpinnakerVM": {
+                        "value": {
+                            "StorageAccountName": "[variables('storageAccountName')]",
+                            "StorageAccountContainerName": "[variables('storageAccountContainerName')]",
+                            "dnsPrefix": "[concat('golivespinip', parameters('resourceIndex'))]",
+                            "publicIPAddressName": "[concat('spinnakerPublicIp', parameters('resourceIndex'))]",
+                            "vmSize": "Standard_D2",
+                            "subnet0Ref": "[variables('subnet0Ref')]"
+                        }
+                    },
+                    "Keyvault": {
+                        "value": {
+                            "name": "[concat('golive', variables('scenarioPrefix'), 'Vault', parameters('resourceIndex'))]",
+                            "userName": "[parameters('vmUsername')]",
+                            "password": "[parameters('vmPassword')]",
+                            "tenantId": "[parameters('spnClientId')]",
+                            "clientId": "[parameters('spnTenantId')]",
+                            "clientSecret": "",
+                            "subscriptionId": "",
+                            "resourceGroupName": "[resourceGroup().name]"
+                        }
+                    },
+                    "Packer": {
+                        "value": {
+                            "resourceGroupName": "[parameters('packerResourceGroupName')]",
+                            "storageAccountName": "[parameters('packerStorageAccountName')]"
+                        }
+                    }
+                }
             }
-          ]
+        },
+        {
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "jenkins-deployment",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/storage-deployment",
+                "Microsoft.Resources/deployments/vnet-deployment"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('jenkinsTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "JenkinsVM": {
+                        "value": {
+                            "StorageAccountName": "[variables('storageAccountName')]",
+                            "StorageAccountContainerName": "[variables('storageAccountContainerName')]",
+                            "dnsPrefix": "[concat('golivejenkinsip', parameters('resourceIndex'))]",
+                            "publicIPAddressName": "[concat('jenkinsPublicIp', parameters('resourceIndex'))]",
+                            "vmSize": "Standard_D2",
+                            "subnet0Ref": "[variables('subnet0Ref')]"
+                        }
+                    },
+                    "Keyvault": {
+                        "value": {
+                            "name": "[concat('golive', variables('scenarioPrefix'), 'Vault', parameters('resourceIndex'))]",
+                            "userName": "[parameters('vmUsername')]",
+                            "password": "[parameters('vmPassword')]",
+                            "tenantId": "[parameters('spnClientId')]",
+                            "clientId": "[parameters('spnTenantId')]",
+                            "clientSecret": "",
+                            "subscriptionId": "",
+                            "resourceGroupName": "[resourceGroup().name]"
+                        }
+                    }
+                }
+            }
         }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('vmName'),'1','/SpinnakerCustomScript')]",
-      "apiVersion": "[variables('apiVersion')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '1')]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.Extensions",
-        "type": "CustomScript",
-        "typeHandlerVersion": "2.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "fileUris": "[split(variables('SpinnakerCustomScript').fileUris, ' ')]",
-          "commandToExecute": "[concat(variables('SpinnakerCustomScript').commandToExecute, variables('credentials').subscriptionId, variables('credentials').tenantId, variables('credentials').clientId, variables('credentials').clientSecret, variables('packer').resourceGroupName, variables('packer').storageAccountName, variables('keyVault').resourceGroupName, variables('keyVault').keyVaultName)]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('vmName'),'0','/JenkinsCustomScript')]",
-      "apiVersion": "[variables('apiVersion')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '0')]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.Extensions",
-        "type": "CustomScript",
-        "typeHandlerVersion": "2.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "fileUris": "[split(variables('JenkinsCustomScript').fileUris, ' ')]",
-          "commandToExecute": "[concat(variables('JenkinsCustomScript').commandToExecute, ' ', variables('JenkinsCredentials').adminUserName, ' ', variables('JenkinsCredentials').adminPassword)]"
-        }
-      }
-    }
-  ]
+    ],
+    "outputs": {}
 }

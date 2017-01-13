@@ -1,0 +1,216 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "SpinnakerVM": {
+            "type": "object",
+            "metadata": {
+                "Description": "StorageAccountName (string): name of storage account into which VHDs will be placed. "
+            }
+        },
+        "Keyvault": {
+            "type": "object",
+            "metadata": {
+                "Description": "A keyvault and a few secrets."
+            }
+        },
+        "Packer": {
+            "type": "object",
+            "metadata": {
+                "Description": "Resource group that contains Packer VM, Storage account that contains Packer assets."
+            }
+        }
+    },
+    "variables": {
+        "scenarioPrefix": "spinnaker",
+        "VM": {
+            "name": "Spinnaker",
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "14.04.2-LTS",
+            "version": "latest"
+        },
+        "OSDiskName": "[concat(variables('scenarioPrefix'),'OSDisk')]",
+        "templateAPIVersion": "2016-09-01",
+        "networkAPIVersion": "2016-03-30",
+        "keyvaultAPIVersion": "2015-06-01",
+        "computeAPIVersion": "2016-03-30",
+        "publicIPAddressType": "Dynamic",
+        "nicName": "[concat(variables('scenarioPrefix'), 'Nic')]",
+        "vmName": "[concat(variables('scenarioPrefix'), 'Vm')]",
+        "SpinnakerCustomScript": {
+            "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_spinnaker.sh",
+            "commandToExecute": "bash set_azure_spinnaker.sh"
+        },
+        "credentials": {
+            "tenantId": "[concat(' -t ', parameters('Keyvault').tenantId)]",
+            "subscriptionId": "[concat(' -s ', parameters('Keyvault').subscriptionId)]",
+            "clientId": "[concat(' -c ', parameters('Keyvault').clientId)]",
+            "clientSecret": "[concat(' -p ', parameters('Keyvault').clientSecret)]"
+        },
+        "packer": {
+            "resourceGroupName": "[concat(' -g ', parameters('Packer').ResourceGroupName)]",
+            "storageAccountName": "[concat(' -h ', parameters('Packer').StorageAccountName)]"
+        },
+        "keyVault": {
+            "resourceGroupName": "[concat(' -r ', resourceGroup().name)]",
+            "keyVaultName": "[concat(' -k ', parameters('Keyvault').name)]"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('networkAPIVersion')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[parameters('SpinnakerVM').publicIPAddressName]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('SpinnakerVM').dnsPrefix]"
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('networkAPIVersion')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('SpinnakerVM').publicIPAddressName)]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "10.0.0.4",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('SpinnakerVM').publicIPAddressName)]"
+                            },
+                            "subnet": {
+                                "id": "[parameters('SpinnakerVM').subnet0Ref]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "[variables('keyvaultAPIVersion')]",
+            "name": "[parameters('Keyvault').name]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForVolumeEncryption": true,
+                "tenantId": "[parameters('Keyvault').tenantId]",
+                "accessPolicies": [
+                    {
+                        "tenantId": "[parameters('Keyvault').tenantId]",
+                        "objectId": "[parameters('Keyvault').clientId]",
+                        "permissions": {
+                            "keys": [
+                                "all"
+                            ],
+                            "secrets": [
+                                "get"
+                            ]
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "standard",
+                    "family": "A"
+                }
+            },
+            "resources": [
+                {
+                    "type": "secrets",
+                    "name": "VMUsername",
+                    "apiVersion": "2015-06-01",
+                    "properties": {
+                        "value": "[parameters('Keyvault').userName]"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.KeyVault/vaults/', parameters('Keyvault').name)]"
+                    ]
+                },
+                {
+                    "type": "secrets",
+                    "name": "VMPassword",
+                    "apiVersion": "2015-06-01",
+                    "properties": {
+                        "value": "[parameters('Keyvault').password]"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.KeyVault/vaults/', parameters('Keyvault').name)]"
+                    ]
+                }
+            ]
+        },
+        {
+            "apiVersion": "[variables('computeAPIVersion')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('vmName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('SpinnakerVM').vmSize]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmName')]",
+                    "adminUsername": "[parameters('Keyvault').userName]",
+                    "adminPassword": "[parameters('Keyvault').password]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('VM').publisher]",
+                        "offer": "[variables('VM').offer]",
+                        "sku": "[variables('VM').sku]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat('http://',parameters('SpinnakerVM').StorageAccountName, '.blob.core.windows.net/', parameters('SpinnakerVM').StorageAccountContainerName, '/', variables('OSDiskName'),'.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/SpinnakerCustomScript')]",
+            "apiVersion": "[variables('computeAPIVersion')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[split(variables('SpinnakerCustomScript').fileUris, ' ')]",
+                    "commandToExecute": "[concat(variables('SpinnakerCustomScript').commandToExecute, variables('credentials').subscriptionId, variables('credentials').tenantId, variables('credentials').clientId, variables('credentials').clientSecret, variables('packer').resourceGroupName, variables('packer').storageAccountName, variables('keyVault').resourceGroupName, variables('keyVault').keyVaultName)]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
