@@ -71,7 +71,7 @@
             }
         },
         {
-            "apiVersion": "2015-05-01-preview",
+            "apiVersion": "[variables('networkAPIVersion')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "name": "nsgSpinnaker",
             "location": "[resourceGroup().location]",
