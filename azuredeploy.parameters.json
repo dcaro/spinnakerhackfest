@@ -2,10 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "username": {
+    "resourceIndex": {
+      "value": "00"
+    },
+    "vmUserName": {
       "value": "your-linux-admin-userid"
     },
-    "password": {
+    "vmPassword": {
       "value": "your-linux-admin-password"
     },
     "vhdStorageAccountName": {
