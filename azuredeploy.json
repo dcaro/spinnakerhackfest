@@ -8,6 +8,62 @@
                 "description": "An index to append to certain resource names to avoid collisions during testing."
             }
         },
+        "vhdStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the new storage account where VHDs will be stored."
+            }
+        },
+        "spinnakerVMSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4",
+                "Standard_D1",
+                "Standard_D2",
+                "Standard_D3",
+                "Standard_D4",
+                "Standard_DS12_v2",
+                "Standard_DS11_v2"
+            ],
+            "metadata": {
+                "description": "Size of the Spinnaker VM."
+            },
+            "defaultValue": "Standard_DS12_v2"
+        },
+        "jenkinsVMSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4",
+                "Standard_D1",
+                "Standard_D2",
+                "Standard_D3",
+                "Standard_D4",
+                "Standard_DS12_v2",
+                "Standard_DS11_v2"
+            ],
+            "metadata": {
+                "description": "Size of the Jenkins VM."
+            },
+            "defaultValue": "Standard_DS12_v2"
+        },
+        "spinnakerDnsPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "DNS prefix for the Spinnaker VM. dnsprefix.azureregion.cloudapp.azure.com, for example."
+            }
+        },
+        "jenkinsDnsPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "DNS prefix for the Jenkins VM. dnsprefix.azureregion.cloudapp.azure.com, for example."
+            }
+        },
         "vmUserName": {
             "type": "string",
             "metadata": {
@@ -26,15 +82,27 @@
                 "description": "Client ID of the Azure AD application that has rights to spinnaker."
             }
         },
+        "spnClientSecret": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Client Secret of the Azure AD application that has rights to spinnaker."
+            }
+        },
         "spnTenantId": {
             "type": "securestring",
             "metadata": {
                 "description": "Tenant ID of the Azure AD application that has rights to spinnaker."
             }
         },
+        "spnSubscriptionId": {
+            "type": "securestring",
+            "metadata": {
+                "description": "ID of the subscription to contain Spinnaker & Jenkins VMs."
+            }
+        },
         "templateLocation": {
             "type": "string",
-            "defaultValue": "https://golivearmstorage.blob.core.windows.net/spinnaker-jenkins",
+            "defaultValue": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master",
             "metadata": {
                 "description": "Template file location",
                 "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
@@ -51,13 +119,19 @@
             "metadata": {
                 "description": "Storage account holding Packer assets."
             }
+        },
+        "keyVaultAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of your KeyVault account."
+            }
         }
     },
     "variables": {
         "scenarioPrefix": "spinnaker",
         "templateAPIVersion": "2016-09-01",
         "templateBaseUrl": "[concat(parameters('templateLocation'), '/')]",
-        "storageAccountName": "[concat('golivespinvhds', parameters('resourceIndex'))]",
+        "storageAccountName": "[concat(parameters('vhdStorageAccountName'), parameters('resourceIndex'))]",
         "storageAccountContainerName": "vhds",
         "spinnakerTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'spinnakerDeploy.json')]",
         "storageTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'storageDeploy.json')]",
@@ -136,21 +210,21 @@
                         "value": {
                             "StorageAccountName": "[variables('storageAccountName')]",
                             "StorageAccountContainerName": "[variables('storageAccountContainerName')]",
-                            "dnsPrefix": "[concat('golivespinip', parameters('resourceIndex'))]",
+                            "dnsPrefix": "[concat(parameters('spinnakerDnsPrefix'), parameters('resourceIndex'))]",
                             "publicIPAddressName": "[concat('spinnakerPublicIp', parameters('resourceIndex'))]",
-                            "vmSize": "Standard_D2",
+                            "vmSize": "[parameters('spinnakerVMSize')]",
                             "subnet0Ref": "[variables('subnet0Ref')]"
                         }
                     },
                     "Keyvault": {
                         "value": {
-                            "name": "[concat('golive', variables('scenarioPrefix'), 'Vault', parameters('resourceIndex'))]",
+                            "name": "[concat(parameters('keyVaultAccountName'), parameters('resourceIndex'))]",
                             "userName": "[parameters('vmUsername')]",
                             "password": "[parameters('vmPassword')]",
                             "tenantId": "[parameters('spnClientId')]",
                             "clientId": "[parameters('spnTenantId')]",
-                            "clientSecret": "",
-                            "subscriptionId": "",
+                            "clientSecret": "[parameters('spnClientSecret')]",
+                            "subscriptionId": "[parameters('spnSubscriptionId')]",
                             "resourceGroupName": "[resourceGroup().name]"
                         }
                     },
@@ -182,22 +256,16 @@
                         "value": {
                             "StorageAccountName": "[variables('storageAccountName')]",
                             "StorageAccountContainerName": "[variables('storageAccountContainerName')]",
-                            "dnsPrefix": "[concat('golivejenkinsip', parameters('resourceIndex'))]",
+                            "dnsPrefix": "[concat(parameters('jenkinsDnsPrefix'), parameters('resourceIndex'))]",
                             "publicIPAddressName": "[concat('jenkinsPublicIp', parameters('resourceIndex'))]",
-                            "vmSize": "Standard_D2",
+                            "vmSize": "[parameters('jenkinsVMSize')]",
                             "subnet0Ref": "[variables('subnet0Ref')]"
                         }
                     },
                     "Keyvault": {
                         "value": {
-                            "name": "[concat('golive', variables('scenarioPrefix'), 'Vault', parameters('resourceIndex'))]",
                             "userName": "[parameters('vmUsername')]",
-                            "password": "[parameters('vmPassword')]",
-                            "tenantId": "[parameters('spnClientId')]",
-                            "clientId": "[parameters('spnTenantId')]",
-                            "clientSecret": "",
-                            "subscriptionId": "",
-                            "resourceGroupName": "[resourceGroup().name]"
+                            "password": "[parameters('vmPassword')]"
                         }
                     }
                 }
