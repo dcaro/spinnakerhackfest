@@ -56,13 +56,55 @@
         },
         {
             "apiVersion": "[variables('networkAPIVersion')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "nsgJenkins",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ssh_rule",
+                        "properties": {
+                            "description": "Allow SSH",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "portal_rule",
+                        "properties": {
+                            "description": "Allow portal",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "8080",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('networkAPIVersion')]",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', parameters('JenkinsVM').publicIPAddressName)]"
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('JenkinsVM').publicIPAddressName)]",
+                "Microsoft.Network/networkSecurityGroups/nsgJenkins"
             ],
             "properties": {
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/','nsgJenkins')]"
+                },
                 "ipConfigurations": [
                     {
                         "name": "ipconfig1",

@@ -72,13 +72,41 @@
         },
         {
             "apiVersion": "[variables('networkAPIVersion')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "nsgSpinnaker",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ssh_rule",
+                        "properties": {
+                            "description": "Allow SSH",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('networkAPIVersion')]",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', parameters('SpinnakerVM').publicIPAddressName)]"
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('SpinnakerVM').publicIPAddressName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', 'nsgSpinnaker')]"
             ],
             "properties": {
+                "networkSecurityGroup":{
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', 'nsgSpinnaker')]"
+                },
                 "ipConfigurations": [
                     {
                         "name": "ipconfig1",
