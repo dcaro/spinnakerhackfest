@@ -46,7 +46,7 @@ sudo chmod+x $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
 # Download Jenkins Groovy script
 sudo wget -O SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT $SOURCE_URI$JENKINS_GROOVY
 
-# Download jenkins job config file
+# Download jenkins setup file
 sudo wget -O SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT $SOURCE_URI$JENKINS_JOB
 
 #delete any existing config script
