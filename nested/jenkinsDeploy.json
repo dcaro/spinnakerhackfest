@@ -110,7 +110,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "10.0.0.5",
+                            "privateIPAddress": "[parameters('JenkinsVM').privateIp]",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('JenkinsVM').publicIPAddressName)]"
                             },

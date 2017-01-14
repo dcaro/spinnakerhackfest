@@ -4,6 +4,7 @@
     "parameters": {
         "resourceIndex": {
             "type": "string",
+            "defaultValue": "",
             "metadata": {
                 "description": "An index to append to certain resource names to avoid collisions during testing."
             }
@@ -213,7 +214,8 @@
                             "dnsPrefix": "[concat(parameters('spinnakerDnsPrefix'), parameters('resourceIndex'))]",
                             "publicIPAddressName": "[concat('spinnakerPublicIp', parameters('resourceIndex'))]",
                             "vmSize": "[parameters('spinnakerVMSize')]",
-                            "subnet0Ref": "[variables('subnet0Ref')]"
+                            "subnet0Ref": "[variables('subnet0Ref')]",
+                            "privateIp": "10.0.0.4"
                         }
                     },
                     "Keyvault": {
@@ -259,7 +261,8 @@
                             "dnsPrefix": "[concat(parameters('jenkinsDnsPrefix'), parameters('resourceIndex'))]",
                             "publicIPAddressName": "[concat('jenkinsPublicIp', parameters('resourceIndex'))]",
                             "vmSize": "[parameters('jenkinsVMSize')]",
-                            "subnet0Ref": "[variables('subnet0Ref')]"
+                            "subnet0Ref": "[variables('subnet0Ref')]",
+                            "privateIp": "10.0.0.5"
                         }
                     },
                     "Keyvault": {

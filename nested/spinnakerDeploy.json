@@ -112,7 +112,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "10.0.0.4",
+                            "privateIPAddress": "[parameters('SpinnakerVM').privateIp]",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('SpinnakerVM').publicIPAddressName)]"
                             },
