@@ -2,6 +2,7 @@ import hudson.model.JDK
 import hudson.tools.JDKInstaller
 import hudson.tools.InstallSourceProperty
 import jenkins.model.*
+import hudson.model.*
 import com.cloudbees.plugins.credentials.impl.*;
 import com.cloudbees.plugins.credentials.*;
 import com.cloudbees.plugins.credentials.domains.*;
@@ -15,8 +16,9 @@ Credentials c = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsSco
 SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), c)
 
 // Add Orcale user credentials for JDK
-// Credentials c = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,"github user", "description", "user", "password")
-// SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.JDK(), c)
+def inst = Jenkins.getInstance()
+def desc = inst.getDescriptor("hudson.tools.JDKInstaller")
+println desc.doPostCredential('mickey@disney.com','mypassword')
 
 // Add the JDK installation  
 if (descriptor.getInstallations()) {
@@ -30,6 +32,8 @@ if (descriptor.getInstallations()) {
 }
 
 // Add the Gradle configuration
+
+
 
 // Create the pipeline
 // To be done with Jenkins CLI 
