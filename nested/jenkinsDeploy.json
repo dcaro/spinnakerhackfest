@@ -37,7 +37,7 @@
             "adminPassword": "Passw0rd"
         },
         "JenkinsCustomScript": {
-            "fileUris": "https://github.com/dcaro/spinnakerhackfest/blob/master/scripts/set_azure_jenkins.sh",
+            "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/blob/master/scripts/set_azure_jenkins.sh",
             "commandToExecute": "bash set_azure_jenkins.sh"
         }
     },
