@@ -6,6 +6,8 @@ CLEAN_STORAGE_SCRIPT="clear_storage_config.sh"
 CREATE_STORAGE_SCRIPT="config_azure_jenkins_storage.sh"
 CREATE_SERVICE_PRINCIPAL_SCRIPT="create_service_principal.sh"
 INITIAL_JENKINS_CONFIG="init_jenkins.sh"
+JENKINS_JOB="jenkins_job.xml"
+JENKINS_GROOVY="setup_jenkins.groovy"
 #SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
 SOURCE_URI="https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/setup-scripts/"
 
@@ -38,8 +40,14 @@ sudo wget -O $SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT $SOURCE_URI
 sudo chmod +x $SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT
 
 # Download init_jenkins config script
-sudo wget -O SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT $SOURCE_URI$INITIAL_JENKINS_CONFIG
+sudo wget -O $SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT $SOURCE_URI$INITIAL_JENKINS_CONFIG
 sudo chmod+x $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+
+# Download Jenkins Groovy script
+sudo wget -O $SETUP_SCRIPTS_LOCATION$JENKINS_GROOVY $SOURCE_URI$JENKINS_GROOVY
+
+# Download jenkins setup file
+sudo wget -O $SETUP_SCRIPTS_LOCATION$JENKINS_JOB $SOURCE_URI$JENKINS_JOB
 
 #delete any existing config script
 old_config_storage_file="/opt/azure_jenkins_config/config_storage.sh"
