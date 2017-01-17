@@ -109,16 +109,10 @@
                 "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
             }
         },
-        "packerResourceGroupName": {
-            "type": "string",
-            "metadata": {
-                "description": "Resource Group containing Packer."
-            }
-        },
         "packerStorageAccountName": {
             "type": "string",
             "metadata": {
-                "description": "Storage account holding Packer assets."
+                "description": "New storage account to hold Packer assets."
             }
         },
         "keyVaultAccountName": {
@@ -160,6 +154,12 @@
                     "StorageAccount": {
                         "value": {
                             "name": "[variables('storageAccountName')]",
+                            "type": "Standard_LRS"
+                        }
+                    },
+                    "PackerStorageAccount": {
+                        "value": {
+                            "name": "[concat(parameters('packerStorageAccountName'), parameters('resourceIndex'))]",
                             "type": "Standard_LRS"
                         }
                     }
@@ -232,8 +232,7 @@
                     },
                     "Packer": {
                         "value": {
-                            "resourceGroupName": "[parameters('packerResourceGroupName')]",
-                            "storageAccountName": "[parameters('packerStorageAccountName')]"
+                            "storageAccountName": "[concat(parameters('packerStorageAccountName'), parameters('resourceIndex'))]"
                         }
                     }
                 }

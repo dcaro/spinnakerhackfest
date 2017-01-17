@@ -49,7 +49,7 @@
             "clientSecret": "[concat(' -p ', parameters('Keyvault').clientSecret)]"
         },
         "packer": {
-            "resourceGroupName": "[concat(' -g ', parameters('Packer').ResourceGroupName)]",
+            "resourceGroupName": "[concat(' -g ', resourceGroup().name]",
             "storageAccountName": "[concat(' -h ', parameters('Packer').StorageAccountName)]"
         },
         "keyVault": {
