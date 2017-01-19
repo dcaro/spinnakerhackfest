@@ -67,7 +67,7 @@ if (descriptor.getInstallations()) {
 } else {
     println 'add jdk8'
     Jenkins.instance.updateCenter.getById('default').updateDirectlyNow(true)
-    def jdkInstaller = new JDKInstaller('jdk-8u112-oth-JPR', true)
+    def jdkInstaller = new JDKInstaller('jdk-8u121-oth-JPR', true)
     def jdk = new JDK("jdk8", null, [new InstallSourceProperty([jdkInstaller])])
     descriptor.setInstallations(jdk)
 }
