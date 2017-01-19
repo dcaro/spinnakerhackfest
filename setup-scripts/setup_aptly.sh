@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sudo su - jenkins
-cd ~
-sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 9E3E53F19C7DE460
-apt-get update
-apt-get install aptly
+sudo sh -c "cd /opt && mkdir -p aptly && cd aptly && pwd;wget https://dl.bintray.com/smira/aptly/0.9.5/debian-squeeze-x64/aptly;"
+sudo chown jenkins:jenkins aptly
+sudo chmod +x aptly
