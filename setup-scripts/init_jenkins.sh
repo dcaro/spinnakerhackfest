@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Usage : ./init_jenkins.sh -ou oracleuser@oracle.com -op oraclepassword -gu githubuser -gp githubpass
+# -ou : The oracle usernme used to download the JDK 
+# -op : The password associated with this username 
+# -gu : the github username used to access the source code on github
+# -gp : the github password associared to the the username
+
 # If you want to export the job you can run the following command 
 # java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://user:password@localhost:8080 get-job "Build Hello World" > jenkins_job.xml
 
