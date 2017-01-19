@@ -3,6 +3,44 @@
 # If you want to export the job you can run the following command 
 # java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://user:password@localhost:8080 get-job "Build Hello World" > jenkins_job.xml
 
-# This script to configure the following stuff from Jenkins automatically: JDK, Oracle user and password, Gradle 
-java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://jenkins:Passw0rd@localhost:8080 groovy setup_jenkins.groovy 
+# This script to configure Jenkins automatically with a groovy script 
+while [[ $# -gt 1 ]]
+do
+key="$1"
 
+case $key in
+   -ou)
+   ORACLE_USER="$2"
+   shift
+   ;;
+   -op)
+   ORACLE_PWD="$2"
+   shift
+   ;;
+   -gu)
+   GITHUB_USER="$2"
+   shift
+   ;;
+   -gp)
+   GITHUB_PWD="$2"
+   shift
+   ;;
+   *)
+
+   ;;
+esac
+shift
+done
+
+echo ORACLE_USER = "${ORACLE_USER}"
+echo ORACLE_PWD = "${ORACLE_PWD}"
+echo GITHUB_USER = "${GITHUB_USER}"
+echo GITHUB_PWD = "${GITHUB_PWD}"
+
+# This script to configure the following stuff from Jenkins automatically: JDK, Oracle user and password, Gradle
+# java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://jenkins:Passw0rd@localhost:8080 groovy setup_jenkins.groovy user@oracle.com P@ssw0rd githubuser githubpassword
+
+sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://jenkins:Passw0rd@localhost:8080 groovy setup_jenkins.groovy $ORACLE_USER $ORACLE_PWD $GITHUB_USER $GITHUB_PWD
+
+sudo service jenkins stop 
+sudo service jenkins start 

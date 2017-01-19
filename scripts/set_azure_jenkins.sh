@@ -57,6 +57,6 @@ then
 fi
 
 #Installing git 
-sudo apt-get install git
+sudo apt-get install git -y
 
 # Adding aptly 
