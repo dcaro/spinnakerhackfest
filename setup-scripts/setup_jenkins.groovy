@@ -1,3 +1,5 @@
+package hudson.plugins.gradle;
+
 import hudson.model.JDK
 import hudson.tools.JDKInstaller
 import hudson.tools.InstallSourceProperty
@@ -6,14 +8,48 @@ import hudson.model.*
 import com.cloudbees.plugins.credentials.impl.*;
 import com.cloudbees.plugins.credentials.*;
 import com.cloudbees.plugins.credentials.domains.*;
-
-import hudson.tasks.Gradle
+import hudson.plugins.git.GitSCM
+import hudson.triggers.SCMTrigger
+import hudson.tasks.Shell;
 
 def descriptor = new JDK.DescriptorImpl();
+def grdlDescriptor = new Gradle.DescriptorImpl();
 def OracleUser = args[0];
 def OraclePwd = args[1];
 def GitHubUser = args[2];
 def GitHubPwd = args[3];
+def GitHubRepo = "https://github.com/rguthriemsft/hello-karyon-rxnetty/"
+def ShellBuildStep = """rm -f propertyfile.txt
+cat <<EOT >> propertyfile.txt
+version: 1
+BRANCH_NAME: \$BRANCH_NAME
+CHANGE_ID: \$CHANGE_ID
+CHANGE_URL: \$CHANGE_URL
+CHANGE_TITLE \$CHANGE_TITLE
+CHANGE_AUTHOR: \$CHANGE_AUTHOR
+CHANGE_AUTHOR_DISPLAY_NAME: \$CHANGE_AUTHOR_DISPLAY_NAME
+CHANGE_AUTHOR_EMAIL: \$CHANGE_AUTHOR_EMAIL
+CHANGE_TARGET: \$CHANGE_TARGET
+BUILD_NUMBER: \$BUILD_NUMBER
+BUILD_ID: \$BUILD_ID
+BUILD_DISPLAY_NAME: \$BUILD_DISPLAY_NAME
+JOB_NAME: \$JOB_NAME
+JOB_BASE_NAME: \$JOB_BASE_NAME
+BUILD_TAG: \$BUILD_TAG
+EXECUTOR_NUMBER: \$EXECUTOR_NUMBER
+NODE_NAME: \$NODE_NAME
+NODE_LABELS: \$NODE_LABELS
+WORKSPACE: \$WORKSPACE
+JENKINS_HOME: \$JENKINS_HOME
+JENKINS_URL: \$JENKINS_URL
+BUILD_URL: \$BUILD_URL
+JOB_URL: \$JOB_URL
+SVN_REVISION: \$SVN_REVISION
+SVN_URL: \$SVN_URL
+EOT
+
+./gradlew clean packDeb"""
+
 
 // Add github credentials to Jenkins domains
 println 'create github user credentials'
@@ -25,7 +61,7 @@ def inst = Jenkins.getInstance()
 def desc = inst.getDescriptor("hudson.tools.JDKInstaller")
 println desc.doPostCredential(OracleUser,OraclePwd)
 
-// Add the JDK installation  
+// Add the JDK installation
 if (descriptor.getInstallations()) {
     println 'skip jdk installations'
 } else {
@@ -37,12 +73,18 @@ if (descriptor.getInstallations()) {
 }
 
 // Add the Gradle configuration
-// def gradle = new Gradle.GradleInstallation('gradle_3.3', null, [new InstallSourceProperty([new Gradle.GradleInstaller('3.3')])])
+println 'add gradle'
+def grdlInstaller = new GradleInstaller('Gradle 3.3')
+def grdl = new GradleInstallation('Gradle', '', [new InstallSourceProperty([grdlInstaller])] )
+grdlDescriptor.setInstallations(grdl)
 
+// Create workflow
+println 'create workflow'
+job = Jenkins.instance.createProject(FreeStyleProject, 'hello_world')
+job.displayName = 'Build Hello World'
+job.scm = new GitSCM(GitHubRepo)
+job.scm.userRemoteConfigs[0].credentialsId = "github_user"
+job.addTrigger(new SCMTrigger("* * * * *"))
+job.buildersList.add(new Shell(ShellBuildStep))
+job.save()
 
-// Create the pipeline
-// To be done with Jenkins CLI 
-//  java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://user:password@localhost:8080 get-job "Build Hello World" > jenkins_job.xml
-
-// java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://jenkins:Passw0rd@localhost:8080 groovy setup_jenkins.groovy
-// java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://jenkins:Passw0rd@localhost:8080 create-job MyJob < jenkins_job.xml

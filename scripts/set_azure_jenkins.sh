@@ -55,3 +55,8 @@ if [ -f $old_config_storage_file ]
 then
   sudo rm -f $old_config_storage_file
 fi
+
+#Installing git 
+sudo apt-get install git
+
+# Adding aptly 
