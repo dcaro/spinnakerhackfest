@@ -12,7 +12,7 @@ import hudson.plugins.git.GitSCM
 import hudson.triggers.SCMTrigger
 import hudson.tasks.Shell;
 
-def descriptor = new JDK.DescriptorImpl();
+def jdkdescriptor = new JDK.DescriptorImpl();
 def grdlDescriptor = new Gradle.DescriptorImpl();
 def OracleUser = args[0];
 def OraclePwd = args[1];
@@ -62,14 +62,15 @@ def desc = inst.getDescriptor("hudson.tools.JDKInstaller")
 println desc.doPostCredential(OracleUser,OraclePwd)
 
 // Add the JDK installation
-if (descriptor.getInstallations()) {
+if (jdkdescriptor.getInstallations()) {
     println 'skip jdk installations'
 } else {
     println 'add jdk8'
     Jenkins.instance.updateCenter.getById('default').updateDirectlyNow(true)
     def jdkInstaller = new JDKInstaller('jdk-8u121-oth-JPR', true)
     def jdk = new JDK("jdk8", null, [new InstallSourceProperty([jdkInstaller])])
-    descriptor.setInstallations(jdk)
+    jdkdescriptor.setInstallations(jdk)
+    jdkdescriptor.save()
 }
 
 // Add the Gradle configuration
