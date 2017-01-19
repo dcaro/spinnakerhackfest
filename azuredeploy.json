@@ -4,6 +4,7 @@
     "parameters": {
         "resourceIndex": {
             "type": "string",
+            "defaultValue": "",
             "metadata": {
                 "description": "An index to append to certain resource names to avoid collisions during testing."
             }
@@ -108,16 +109,10 @@
                 "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
             }
         },
-        "packerResourceGroupName": {
-            "type": "string",
-            "metadata": {
-                "description": "Resource Group containing Packer."
-            }
-        },
         "packerStorageAccountName": {
             "type": "string",
             "metadata": {
-                "description": "Storage account holding Packer assets."
+                "description": "New storage account to hold Packer assets."
             }
         },
         "keyVaultAccountName": {
@@ -159,6 +154,12 @@
                     "StorageAccount": {
                         "value": {
                             "name": "[variables('storageAccountName')]",
+                            "type": "Standard_LRS"
+                        }
+                    },
+                    "PackerStorageAccount": {
+                        "value": {
+                            "name": "[concat(parameters('packerStorageAccountName'), parameters('resourceIndex'))]",
                             "type": "Standard_LRS"
                         }
                     }
@@ -213,7 +214,8 @@
                             "dnsPrefix": "[concat(parameters('spinnakerDnsPrefix'), parameters('resourceIndex'))]",
                             "publicIPAddressName": "[concat('spinnakerPublicIp', parameters('resourceIndex'))]",
                             "vmSize": "[parameters('spinnakerVMSize')]",
-                            "subnet0Ref": "[variables('subnet0Ref')]"
+                            "subnet0Ref": "[variables('subnet0Ref')]",
+                            "privateIp": "10.0.0.4"
                         }
                     },
                     "Keyvault": {
@@ -230,8 +232,7 @@
                     },
                     "Packer": {
                         "value": {
-                            "resourceGroupName": "[parameters('packerResourceGroupName')]",
-                            "storageAccountName": "[parameters('packerStorageAccountName')]"
+                            "storageAccountName": "[concat(parameters('packerStorageAccountName'), parameters('resourceIndex'))]"
                         }
                     }
                 }
@@ -259,7 +260,8 @@
                             "dnsPrefix": "[concat(parameters('jenkinsDnsPrefix'), parameters('resourceIndex'))]",
                             "publicIPAddressName": "[concat('jenkinsPublicIp', parameters('resourceIndex'))]",
                             "vmSize": "[parameters('jenkinsVMSize')]",
-                            "subnet0Ref": "[variables('subnet0Ref')]"
+                            "subnet0Ref": "[variables('subnet0Ref')]",
+                            "privateIp": "10.0.0.5"
                         }
                     },
                     "Keyvault": {
