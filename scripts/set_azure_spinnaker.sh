@@ -44,7 +44,7 @@ STDDR='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu_trusty_main'
 
 JENKINS_URL='http:\/\/10.0.04:8080'
 JENKINS_USERNAME='jenkins'
-JENKINS_PASSWORD='P@ssw0rd'
+JENKINS_PASSWORD='Passw0rd'
 
 # Record the Variables in text file for debugging purposes  
 sudo printf "TENANTID=%s\n" $TENANTID > $DEBUG_FILE
