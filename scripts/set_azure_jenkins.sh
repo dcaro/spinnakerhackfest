@@ -13,6 +13,8 @@ JENKINS_GROOVY="setup_jenkins.groovy"
 SOURCE_URI="https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/setup-scripts/"
 ORACLE_USER="$3"
 ORACLE_PASSWORD="$4"
+JENKINS_USER="$1"
+JENKINS_PWD="$2"
 
 #delete any previous user if there is any
 if [ ! -d $JENKINS_USER ]
@@ -67,8 +69,14 @@ fi
 sudo apt-get install git -y
 
 # Replace the Oracle username and password in the init script
-SED_STRING1='s/ORACLE_USER=\"\"/ORACLE_USER=\"'$ORACLE_USER'\"/'
+SED_STRING3='s/ORACLE_USER=\"\"/ORACLE_USER=\"'$ORACLE_USER'\"/'
+sudo sed -i $SED_STRING3 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+
+SED_STRING4='s/ORACLE_PASSWORD=\"\"/ORACLE_PASSWORD=\"'$ORACLE_PASSWORD'\"/'
+sudo sed -i $SED_STRING4 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+
+SED_STRING1='s/JENKINS_USER=\"\"/JENKINS_USER=\"'$JENKINS_USER'\"/'
 sudo sed -i $SED_STRING1 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
 
-SED_STRING2='s/ORACLE_PASSWORD=\"\"/ORACLE_PASSWORD=\"'$ORACLE_PASSWORD'\"/'
+SED_STRING2='s/JENKINS_PWD=\"\"/JENKINS_PWD=\"'$JENKINS_PWD'\"/'
 sudo sed -i $SED_STRING2 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG

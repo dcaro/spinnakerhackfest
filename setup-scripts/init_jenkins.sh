@@ -15,6 +15,8 @@
 # Default values
 ORACLE_USER=""
 ORACLE_PASSWORD=""
+JENKINS_USER=""
+JENKINS_PWD=""
 
 while [[ $# -gt 1 ]]
 do
