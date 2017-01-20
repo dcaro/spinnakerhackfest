@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage : ./init_jenkins.sh -ou oracleuser@oracle.com -op oraclepassword -gu githubuser -gp githubpass -ju jenkins -pj Passw0rd
+# Usage : ./init_jenkins.sh -ou oracleuser@oracle.com -op oraclepassword -gu githubuser -gp githubpass -ju jenkins -jp Passw0rd
 # -ou : The oracle usernme used to download the JDK 
 # -op : The password associated with this username 
 # -gu : the github username used to access the source code on github
