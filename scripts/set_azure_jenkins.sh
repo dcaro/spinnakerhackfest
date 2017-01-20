@@ -11,8 +11,8 @@ JENKINS_JOB="jenkins_job.xml"
 JENKINS_GROOVY="setup_jenkins.groovy"
 #SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
 SOURCE_URI="https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/setup-scripts/"
-ORACLE_USER="$2"
-ORACLE_PASSWORD="$3"
+ORACLE_USER="$3"
+ORACLE_PASSWORD="$4"
 
 #delete any previous user if there is any
 if [ ! -d $JENKINS_USER ]
