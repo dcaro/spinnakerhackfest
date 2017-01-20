@@ -2,8 +2,10 @@
 
 # Get azure data 
 # clientId : -c 
-# AppKey: -a 
-
+# AppKey: -a
+# Default values
+JENKINS_USERNAME="jenkins"
+JENKINS_PASSWORD="Passw0rd"
 
 while getopts ":t:s:p:c:g:h:r:k:b:j:u:q:" opt; do
   case $opt in
@@ -42,9 +44,8 @@ SPINNAKER_ENTRY=$WORKDIR"/spinnaker.inputs"
 BINTRAY='http:\/\/dl.bintray.com\/richardguthrie\/rguthrie-spinnaker_trusty_release'
 STDDR='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu_trusty_main'
 
-JENKINS_URL='http:\/\/10.0.04:8080'
-JENKINS_USERNAME='jenkins'
-JENKINS_PASSWORD='Passw0rd'
+JENKINS_URL='http:\/\/10.0.0.5:8080'
+
 
 # Record the Variables in text file for debugging purposes  
 sudo printf "TENANTID=%s\n" $TENANTID > $DEBUG_FILE

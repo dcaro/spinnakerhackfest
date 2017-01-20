@@ -46,6 +46,18 @@
     },
     "keyVaultAccountName": {
       "value": "your-keyvault-account-name"
+    },
+    "OracleUser" : {
+      "value": "your-oracle-account-name"
+    },
+    "OraclePassword" : {
+      "value" : "your-oracle-password"
+    },
+    "JenkinsUser" : {
+      "value" : "your-jenkins-username"
+    },
+    "JenkinsPassword" : { 
+      "value" : "your-jenkins-password"
     }
   }
 }

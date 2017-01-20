@@ -11,6 +11,8 @@ JENKINS_JOB="jenkins_job.xml"
 JENKINS_GROOVY="setup_jenkins.groovy"
 #SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
 SOURCE_URI="https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/setup-scripts/"
+ORACLE_USER="$2"
+ORACLE_PASSWORD="$3"
 
 #delete any previous user if there is any
 if [ ! -d $JENKINS_USER ]
@@ -54,13 +56,16 @@ sudo wget -O $SETUP_SCRIPTS_LOCATION$JENKINS_JOB $SOURCE_URI$JENKINS_JOB
 sudo wget -O $SETUP_SCRIPTS_LOCATION$APTLY_SCRIPT $SOURCE_URI$APTLY_SCRIPT
 sudo chmod +x $SETUP_SCRIPTS_LOCATION$APTLY_SCRIPT
 
-#delete any existing config script
+# Delete any existing config script
 old_config_storage_file="/opt/azure_jenkins_config/config_storage.sh"
 if [ -f $old_config_storage_file ]
 then
   sudo rm -f $old_config_storage_file
 fi
 
-#Installing git 
+# Installing git 
 sudo apt-get install git -y
 
+# Replace the Oracle username and password in the init script
+sudo sed -i "/ORACLE_USER=\"\"/s/ORACLE_USER=\"$ORACLE_USER\"" $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+sudo sed -i "/ORACLE_PASSWORD=\"\"/s/ORACLE_PASSWORD=\"$ORACLE_PASSWORD\"" $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG

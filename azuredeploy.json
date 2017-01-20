@@ -120,6 +120,30 @@
             "metadata": {
                 "description": "Name of your KeyVault account."
             }
+        },
+        "OracleUser": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of your Oracle Account used to download the JDK."
+            }
+        },
+        "OraclePassword": {
+            "type": "string",
+            "metadata": {
+                "description": "Password of your Oracle account."
+            }
+        },
+        "JenkinsUser": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of your Jenkins User account."
+            }
+        },
+        "JenkinsPassword": {
+            "type": "string",
+            "metadata": {
+                "description": "Password of your Jenkins User account."
+            }
         }
     },
     "variables": {
@@ -268,6 +292,12 @@
                         "value": {
                             "userName": "[parameters('vmUsername')]",
                             "password": "[parameters('vmPassword')]"
+                        }
+                    },
+                    "Account": {
+                        "value": {
+                            "OracleUser": "[parameters('OracleUser')]",
+                            "OraclePassword": "[parameters('OraclePassword')]"
                         }
                     }
                 }

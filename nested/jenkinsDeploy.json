@@ -13,6 +13,12 @@
             "metadata": {
                 "Description": "A keyvault and a few secrets."
             }
+        },
+        "Account": {
+            "type": "object",
+            "metadata": {
+                "Description": "The username and password to initial Jenkins setup."
+            }
         }
     },
     "variables": {
@@ -179,7 +185,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": "[split(variables('JenkinsCustomScript').fileUris, ' ')]",
-                    "commandToExecute": "[concat(variables('JenkinsCustomScript').commandToExecute, ' ', variables('JenkinsCredentials').adminUserName, ' ', variables('JenkinsCredentials').adminPassword)]"
+                    "commandToExecute": "[concat(variables('JenkinsCustomScript').commandToExecute, ' ', variables('JenkinsCredentials').adminUserName, ' ', variables('JenkinsCredentials').adminPassword, ' ', parameters('Account').OracleUser, ' ', parameters('Account').OraclePassword)]"
                 }
             }
         }

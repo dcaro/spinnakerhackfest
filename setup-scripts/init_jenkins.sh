@@ -12,6 +12,10 @@
 # java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://user:password@localhost:8080 get-job "Build Hello World" > jenkins_job.xml
 
 # This script to configure Jenkins automatically with a groovy script 
+# Default values
+ORACLE_USER=""
+ORACLE_PASSWORD=""
+
 while [[ $# -gt 1 ]]
 do
 key="$1"
@@ -22,7 +26,7 @@ case $key in
    shift
    ;;
    -op)
-   ORACLE_PWD="$2"
+   ORACLE_PASSWORD="$2"
    shift
    ;;
    -gu)
@@ -33,12 +37,6 @@ case $key in
    GITHUB_PWD="$2"
    shift
    ;;
-   -ju)
-   JENKINS_USER="$2"
-   ;;
-   -jp)
-   JENKINS_PWD="$2"
-   ;;
    *)
 
    ;;
@@ -46,19 +44,19 @@ esac
 shift
 done
 
+APTLY_REPO_NAME="hello"
+
 echo ORACLE_USER = "${ORACLE_USER}"
-echo ORACLE_PWD = "${ORACLE_PWD}"
-echo GITHUB_USER = "${GITHUB_USER}"
-echo GITHUB_PWD = "${GITHUB_PWD}"
+echo ORACLE_PASSWORD = "${ORACLE_PASSWORD}"
 echo JENKINS_USER = "${JENKINS_USER}"
 echo JENKINS_PWD = "${JENKINS_PWD}"
 
 # Installing Aptly
-./setup_aptly.sh
+./setup_aptly.sh $APTLY_REPO_NAME
 
 # This script to configure the following stuff from Jenkins automatically: JDK, Oracle user and password, Gradle
 # java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://jenkins:Passw0rd@localhost:8080 groovy setup_jenkins.groovy user@oracle.com P@ssw0rd githubuser githubpassword
-sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://$JENKINS_USER:$JENKINS_PWD@localhost:8080 groovy setup_jenkins.groovy $ORACLE_USER $ORACLE_PWD $GITHUB_USER $GITHUB_PWD
+sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://$JENKINS_USER:$JENKINS_PWD@localhost:8080 groovy setup_jenkins.groovy $ORACLE_USER $ORACLE_PASSWORD
 
 sudo service jenkins stop 
 sudo service jenkins start 
