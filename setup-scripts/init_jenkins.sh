@@ -17,6 +17,7 @@ ORACLE_USER=""
 ORACLE_PASSWORD=""
 JENKINS_USER=""
 JENKINS_PWD=""
+APTLY_REPO_NAME=""
 
 while [[ $# -gt 1 ]]
 do
@@ -37,6 +38,10 @@ case $key in
    ;;
    -gp)
    GITHUB_PWD="$2"
+   shift
+   ;;
+   -ar)
+   APTLY_REPO_NAME="$2"
    shift
    ;;
    *)

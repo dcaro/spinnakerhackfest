@@ -144,6 +144,12 @@
             "metadata": {
                 "description": "Password of your Jenkins User account."
             }
+        },
+        "AptlyRepoName" : { 
+            "type": "string",
+            "metadata": {
+                "description": "Aptly Repo name"
+            }
         }
     },
     "variables": {
@@ -297,7 +303,8 @@
                     "Account": {
                         "value": {
                             "OracleUser": "[parameters('OracleUser')]",
-                            "OraclePassword": "[parameters('OraclePassword')]"
+                            "OraclePassword": "[parameters('OraclePassword')]",
+                            "AptlyRepoName": "[parameters('AptlyRepoName')]"
                         }
                     }
                 }

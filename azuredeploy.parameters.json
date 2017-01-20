@@ -58,6 +58,9 @@
     },
     "JenkinsPassword" : { 
       "value" : "your-jenkins-password"
+    },
+    "AptlyRepoName" : {
+      "value" : "your-aptly-repository-name"
     }
   }
 }
