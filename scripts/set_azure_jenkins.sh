@@ -6,6 +6,7 @@ CLEAN_STORAGE_SCRIPT="clear_storage_config.sh"
 CREATE_STORAGE_SCRIPT="config_azure_jenkins_storage.sh"
 CREATE_SERVICE_PRINCIPAL_SCRIPT="create_service_principal.sh"
 INITIAL_JENKINS_CONFIG="init_jenkins.sh"
+APTLY_SCRIPT="setup_aptly.sh"
 JENKINS_JOB="jenkins_job.xml"
 JENKINS_GROOVY="setup_jenkins.groovy"
 #SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
@@ -49,6 +50,10 @@ sudo wget -O $SETUP_SCRIPTS_LOCATION$JENKINS_GROOVY $SOURCE_URI$JENKINS_GROOVY
 # Download jenkins setup file
 sudo wget -O $SETUP_SCRIPTS_LOCATION$JENKINS_JOB $SOURCE_URI$JENKINS_JOB
 
+# Download aptly setup script
+sudo wget -O $SETUP_SCRIPTS_LOCATION$APTLY_SCRIPT $SOURCE_URI$APTLY_SCRIPT
+sudo chmod +x $SETUP_SCRIPTS_LOCATION$APTLY_SCRIPT
+
 #delete any existing config script
 old_config_storage_file="/opt/azure_jenkins_config/config_storage.sh"
 if [ -f $old_config_storage_file ]
@@ -59,4 +64,3 @@ fi
 #Installing git 
 sudo apt-get install git -y
 
-# Adding aptly 

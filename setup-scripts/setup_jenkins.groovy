@@ -1,8 +1,7 @@
 package hudson.plugins.gradle;
 
 import hudson.model.JDK
-import hudson.tools.JDKInstaller
-import hudson.tools.InstallSourceProperty
+import hudson.tools.*
 import jenkins.model.*
 import hudson.model.*
 import com.cloudbees.plugins.credentials.impl.*;
@@ -19,7 +18,7 @@ def OraclePwd = args[1];
 def GitHubUser = args[2];
 def GitHubPwd = args[3];
 def GitHubRepo = "https://github.com/rguthriemsft/hello-karyon-rxnetty/"
-def ShellBuildStep = """rm -f propertyfile.txt
+def ShellBuildStep1 = """rm -f propertyfile.txt
 cat <<EOT >> propertyfile.txt
 version: 1
 BRANCH_NAME: \$BRANCH_NAME
@@ -50,6 +49,9 @@ EOT
 
 ./gradlew clean packDeb"""
 
+def ShellBuildStep2 = """
+~/aptly repo add -force-replace hello build/distributions/*.deb ~/aptly publish update -force-overwrite -architectures="amd64" -skip-signing=true trusty
+"""
 
 // Add github credentials to Jenkins domains
 println 'create github user credentials'
@@ -72,6 +74,7 @@ if (jdkdescriptor.getInstallations()) {
     jdkdescriptor.setInstallations(jdk)
     jdkdescriptor.save()
 }
+inst.save()
 
 // Add the Gradle configuration
 println 'add gradle'
@@ -86,6 +89,7 @@ job.displayName = 'Build Hello World'
 job.scm = new GitSCM(GitHubRepo)
 job.scm.userRemoteConfigs[0].credentialsId = "github_user"
 job.addTrigger(new SCMTrigger("* * * * *"))
-job.buildersList.add(new Shell(ShellBuildStep))
+job.buildersList.add(new Shell(ShellBuildStep1))
+job.buildersList.add(new Shell(ShellBuildStep2))
 job.save()
 
