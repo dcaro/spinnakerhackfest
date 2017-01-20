@@ -8,6 +8,7 @@ import com.cloudbees.plugins.credentials.impl.*;
 import com.cloudbees.plugins.credentials.*;
 import com.cloudbees.plugins.credentials.domains.*;
 import hudson.plugins.git.GitSCM
+import hudson.plugins.copyartifact.CopyArtifact
 import hudson.triggers.SCMTrigger
 import hudson.tasks.Shell;
 
@@ -49,8 +50,7 @@ EOT
 
 ./gradlew clean packDeb"""
 
-def ShellBuildStep2 = """
-~/aptly repo add -force-replace hello build/distributions/*.deb ~/aptly publish update -force-overwrite -architectures="amd64" -skip-signing=true trusty
+def ShellBuildStep2 = """/opt/aptly/aptly repo add -force-replace hello build/distributions/*.deb /opt/aptly/aptly publish update -force-overwrite -architectures="amd64" -skip-signing=true trusty
 """
 
 // Add github credentials to Jenkins domains
@@ -81,6 +81,7 @@ println 'add gradle'
 def grdlInstaller = new GradleInstaller('Gradle 3.3')
 def grdl = new GradleInstallation('Gradle', '', [new InstallSourceProperty([grdlInstaller])] )
 grdlDescriptor.setInstallations(grdl)
+inst.save()
 
 // Create workflow
 println 'create workflow'
@@ -91,5 +92,6 @@ job.scm.userRemoteConfigs[0].credentialsId = "github_user"
 job.addTrigger(new SCMTrigger("* * * * *"))
 job.buildersList.add(new Shell(ShellBuildStep1))
 job.buildersList.add(new Shell(ShellBuildStep2))
+//job.publishersList.add(new hudson.plugins.copyartifact.CopyArtifact(archivefile))
 job.save()
 
