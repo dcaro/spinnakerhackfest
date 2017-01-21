@@ -38,11 +38,10 @@ done
 
 WORKDIR=$(pwd)
 # Usually the workdir is /var/lib/waagent/custom-script/download/0
-JENKINS_URL='http:\/\/10.0.0.5:8080'
+JENKINS_URL='http:\/\/10.0.0.5'
 DEBUG_FILE=$WORKDIR"/debugfile"
 SED_FILE=$WORKDIR"/sedCommand.sed"
 SPINNAKER_ENTRY=$WORKDIR"/spinnaker.inputs"
-REPO='http:\/\/'$JENKINS_URL':9999 trusty main'
 
 # Record the Variables in text file for debugging purposes  
 sudo printf "TENANTID=%s\n" $TENANTID > $DEBUG_FILE
@@ -94,7 +93,7 @@ sudo printf "s/defaultKeyVault:$/& %s/\n" $KEYVAULT >> $SED_FILE
 sudo printf "/igor:/ {\n           N\n           N\n           N\n           /enabled:/ {\n             s/enabled:.*/enabled: true/\n             P\n             D\n         }\n}\n" >> $SED_FILE
 
 # Configure the Jenkins instance
-sudo printf "/name: Jenkins.*/ {\n N\n /baseUrl:/ { s/baseUrl:.*/baseUrl: %s/ }\n" $JENKINS_URL >> $SED_FILE
+sudo printf "/name: Jenkins.*/ {\n N\n /baseUrl:/ { s/baseUrl:.*/baseUrl: %s:8080/ }\n" $JENKINS_URL >> $SED_FILE
 sudo printf " N\n /username:/ { s/username:/username: %s/ }\n" $JENKINS_USERNAME >> $SED_FILE
 sudo printf " N\n /password:/ { s/password:/password: %s/ }\n" $JENKINS_PASSWORD >> $SED_FILE
 sudo printf "}" >> $SED_FILE
@@ -106,7 +105,7 @@ sudo sed -i -f $SED_FILE /opt/spinnaker/config/spinnaker-local.yml
 sudo printf "spinnaker-local.yml file has been updated\n" >> $DEBUG_FILE
 
 # Configure rosco.yml file  
-sudo sed -i '/^# debianRepository:/s/.*/debianRepository: '$REPO'/' /opt/rosco/config/rosco.yml
+sudo sed -i "/# debianRepository:/s/.*/debianRepository: $JENKINS_URL:9999 trusty main/" /opt/rosco/config/rosco.yml
 sudo sed -i '/defaultCloudProviderType/s/.*/defaultCloudProviderType: azure/' /opt/rosco/config/rosco.yml
 sudo printf "rosco.yml file has been updated\n" >> $DEBUG_FILE
 
