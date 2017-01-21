@@ -63,7 +63,7 @@ echo JENKINS_PWD = "${JENKINS_PWD}"
 
 # This script to configure the following stuff from Jenkins automatically: JDK, Oracle user and password, Gradle
 # java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://jenkins:Passw0rd@localhost:8080 groovy setup_jenkins.groovy user@oracle.com P@ssw0rd githubuser githubpassword
-sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://$JENKINS_USER:$JENKINS_PWD@localhost:8080 groovy setup_jenkins.groovy $ORACLE_USER $ORACLE_PASSWORD
+sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://$JENKINS_USER:$JENKINS_PWD@localhost:8080 groovy init.groovy $ORACLE_USER $ORACLE_PASSWORD
 
 sudo service jenkins stop 
 sudo service jenkins start 
