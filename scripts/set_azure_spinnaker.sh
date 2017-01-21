@@ -38,14 +38,11 @@ done
 
 WORKDIR=$(pwd)
 # Usually the workdir is /var/lib/waagent/custom-script/download/0
+JENKINS_URL='http:\/\/10.0.0.5:8080'
 DEBUG_FILE=$WORKDIR"/debugfile"
 SED_FILE=$WORKDIR"/sedCommand.sed"
 SPINNAKER_ENTRY=$WORKDIR"/spinnaker.inputs"
-BINTRAY='http:\/\/dl.bintray.com\/richardguthrie\/rguthrie-spinnaker_trusty_release'
-STDDR='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu_trusty_main'
-
-JENKINS_URL='http:\/\/10.0.0.5:8080'
-
+REPO='http:\/\/'$JENKINS_URL':9999 trusty main'
 
 # Record the Variables in text file for debugging purposes  
 sudo printf "TENANTID=%s\n" $TENANTID > $DEBUG_FILE
@@ -109,7 +106,7 @@ sudo sed -i -f $SED_FILE /opt/spinnaker/config/spinnaker-local.yml
 sudo printf "spinnaker-local.yml file has been updated\n" >> $DEBUG_FILE
 
 # Configure rosco.yml file  
-sudo sed -i '/^# debianRepository:/s/.*/debianRepository: '$STDDR':'$BINTRAY'/' /opt/rosco/config/rosco.yml
+sudo sed -i '/^# debianRepository:/s/.*/debianRepository: '$REPO'/' /opt/rosco/config/rosco.yml
 sudo sed -i '/defaultCloudProviderType/s/.*/defaultCloudProviderType: azure/' /opt/rosco/config/rosco.yml
 sudo printf "rosco.yml file has been updated\n" >> $DEBUG_FILE
 
