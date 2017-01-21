@@ -185,7 +185,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": "[split(variables('JenkinsCustomScript').fileUris, ' ')]",
-                    "commandToExecute": "[concat(variables('JenkinsCustomScript').commandToExecute, ' ', variables('JenkinsCredentials').adminUserName, ' ', variables('JenkinsCredentials').adminPassword, ' ', parameters('Account').OracleUser, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName]"
+                    "commandToExecute": "[concat(variables('JenkinsCustomScript').commandToExecute, ' ', variables('JenkinsCredentials').adminUserName, ' ', variables('JenkinsCredentials').adminPassword, ' ', parameters('Account').OracleUser, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName)]"
                 }
             }
         }
