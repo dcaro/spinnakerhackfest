@@ -17,7 +17,14 @@ In order to deploy here are the steps to follow:
 **Note**: the azuredeploy.myparams.json is a copy of the azuredeploy.params.json with your own parameters
 
 4- Unlock Jenkins
-Use the initialadminpassword to unlock Jenkins and install the default plugins
+
+SSH to the JenkinsVM and open he /var/lib/jenkins/secrets/initialadminpassword to unlock Jenkins, install the default plugins and create a jenkins user with the same parameters than the ones entered at the deployment of the VM.
 
 5- Initialize Jenkins 
-SSH to Jenkins and run the /opt/azure_jenkins_config/
+
+SSH to Jenkins and run the following command: 
+
+  ``/opt/azure_jenkins_config/init_jenkins.sh `` 
+
+6- Open an ssh tunnel to you spinnaker host and access http://localhost:9000
+
