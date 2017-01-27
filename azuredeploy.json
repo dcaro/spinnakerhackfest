@@ -253,8 +253,8 @@
                             "name": "[concat(parameters('keyVaultAccountName'), parameters('resourceIndex'))]",
                             "userName": "[parameters('vmUsername')]",
                             "password": "[parameters('vmPassword')]",
-                            "tenantId": "[parameters('spnClientId')]",
-                            "clientId": "[parameters('spnTenantId')]",
+                            "tenantId": "[parameters('spnTenantId')]",
+                            "clientId": "[parameters('spnClientId')]",
                             "clientSecret": "[parameters('spnClientSecret')]",
                             "subscriptionId": "[parameters('spnSubscriptionId')]",
                             "resourceGroupName": "[resourceGroup().name]"

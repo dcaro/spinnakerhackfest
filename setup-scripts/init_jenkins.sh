@@ -59,7 +59,7 @@ echo JENKINS_USER = "${JENKINS_USER}"
 echo JENKINS_PWD = "${JENKINS_PWD}"
 
 # Installing Aptly
-./setup_aptly.sh $APTLY_REPO_NAME
+/opt/azure_jenkins_config/setup_aptly.sh -ar $APTLY_REPO_NAME
 
 # This script to configure the following stuff from Jenkins automatically: JDK, Oracle user and password, Gradle
 # java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://jenkins:Passw0rd@localhost:8080 groovy setup_jenkins.groovy user@oracle.com P@ssw0rd githubuser githubpassword
