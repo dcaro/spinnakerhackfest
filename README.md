@@ -1,7 +1,8 @@
 # spinnakerhackfest
 Jenkins and Spinnaker VM template
 
-This template will allow the automated deployment of Jenkins + Spinnaker in two different VMs in Azure. 
+This template will allow the automated deployment of Jenkins + Spinnaker in two different VMs in Azure.  This guide uses the Azure-Cli 2.0.  Instructions to install/update to the latest version can be found [here](https://docs.microsoft.com/en-us/cli/azure/install-az-cli2).
+ 
 In order to deploy here are the steps to follow: 
 
 1- Create a Service Principal name
