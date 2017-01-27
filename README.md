@@ -9,11 +9,11 @@ In order to deploy here are the steps to follow:
 
 2- Create a resource groups
 
-  `` az resource group create -n testspinnaker11 -l westus `` 
+  `` az group create -n testspinnaker11 -l westus `` 
 
 3- Deploy the VMs 
 
- `` az resource group deployment create -g testspinnaker11 -n deploy --template-file ./azuredeploy.json --parameters @./azuredeploy.myparams.json `` 
+ `` az group deployment create -g testspinnaker11 -n deploy --template-file ./azuredeploy.json --parameters @./azuredeploy.myparams.json `` 
 
 **Note**: the azuredeploy.myparams.json is a copy of the azuredeploy.params.json with your own parameters
 

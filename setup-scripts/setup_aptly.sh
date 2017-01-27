@@ -3,6 +3,7 @@
 #usage : ./init_aptly.sh -ar debianRepoName
 # -ar : the aptly repo name
 
+WORK_DIR="/var/lib/jenkins"
 while [[ $# -gt 1 ]]
 do
 key="$1"
@@ -21,15 +22,15 @@ shift
 done
 
 echo "Downloading aptly to /var/lib/jenkins"
-sudo sh -c "cd /var/lib/jenkins && pwd;wget https://dl.bintray.com/smira/aptly/0.9.5/debian-squeeze-x64/aptly;"
-sudo chown jenkins:jenkins aptly
-sudo chmod +x aptly
+sudo sh -c "cd $WORK_DIR && pwd;wget https://dl.bintray.com/smira/aptly/0.9.5/debian-squeeze-x64/aptly;"
+sudo chown jenkins:jenkins $WORK_DIR/aptly
+sudo chmod +x $WORK_DIR/aptly
 
 echo "Creating repo"
-./aptly repo create $APTLY_REPO_NAME
+$WORK_DIR/aptly repo create $APTLY_REPO_NAME
 
 echo "Publishing repo"
-./aptly publish repo -architectures="amd64" -component=main -distribution=trusty -skip-signing=true $APTLY_REPO_NAME
+$WORK_DIR/aptly publish repo -architectures="amd64" -component=main -distribution=trusty -skip-signing=true $APTLY_REPO_NAME
 
 #install nginx
 echo "Installing nginx"
