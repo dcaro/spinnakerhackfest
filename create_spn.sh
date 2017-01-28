@@ -49,11 +49,11 @@ shift
 done
 
 echo "Debug information:"
-echo "Tenant Id: "$TENANT_ID
-echo "Display Name: "$DISPLAY_NAME
-echo "Application Name: "$APPLICATION_NAME
-echo "Application Uri: "$APPLICATION_URI
-echo "Application Key: "$APPLICATION_KEY
+echo " Tenant Id: "$TENANT_ID
+echo " Display Name: "$DISPLAY_NAME
+echo " Application Name: "$APPLICATION_NAME
+echo " Application Uri: "$APPLICATION_URI
+echo " Application Key: "$APPLICATION_KEY
 
 # Obtain the tenantId of the subscriptions
 if [ -z "$TENANT_ID" ]
@@ -61,9 +61,9 @@ then
     AZURE_ACCOUNT=$(az account show --subscription "$SUBSCRIPTION_NAME")
     echo $AZURE_ACCOUNT
     TENANT_ID=$(echo $AZURE_ACCOUNT | jq .tenantId | sed 's/"//g')
-    CLOUD_ID=$(echo $AZURE_ACCOUNT | jq .id | sed 's/"//g')
+    SUBSCRIPTION_ID=$(echo $AZURE_ACCOUNT | jq .id | sed 's/"//g')
     echo "TenantId = $TENANT_ID"
-    echo "CloudId = $CLOUD_ID"
+    echo "Subscription Id = $SUBSCRIPTION_ID"
 fi 
 
 
@@ -80,7 +80,8 @@ else
     AZAD_APP=$(az ad app create --display-name="$DISPLAY_NAME" --homepage="http://$APPLICATION_NAME" --identifier-uris="http://$APPLICATION_URI" --key-type="Password" --password="$APPLICATION_KEY")
     echo $AZAD_APP
     echo "Waiting for the creation of the app"
-    sleep 5 
+     # Wait for operation to complete
+    sleep 10
     #  Verify if the application has been created
     ###### Add the code to verify if the app has been created 
 fi
@@ -97,13 +98,22 @@ else
     error_check=$(az ad sp list --filter "servicePrincipalNames/any(servicePrincipalNames: servicePrincipalNames eq 'http://$APPLICATION_URI')")
     if [ -z $error_check ];
     then 
-        SPN=$(az ad sp create --id="$APP_ID")
-        # | jq -r '.[0].objectId'
-        echo "SPN is $SPN"
-        ######## Need to get the SPNID here
+        SPN_ObjectID=$(az ad sp create --id="$APP_ID" | jq -r '.objectId')
+        echo "SPNId is $SPN_ObjectID"
+        echo "Waiting for the SPN creation to complete"
+        # Wait for operation to complete
+        sleep 10        
     fi
 fi
 
 # Do the role assignment 
+az role assignment create --assignee="$SPN_ObjectID" --role="Owner" --scope="/subscriptions/$SUBSCRIPTION_ID"
 
-#az role assignment create --assignee="$SPN_ObjectID" --role="Owner" --scope="/subscriptions/$CLOUD_ID"
+echo " Subscription ID: " $SUBSCRIPTION_ID
+echo " Tenant ID:" $TENANT_ID
+echo " Client ID": $APP_ID
+echo " Client Secret": $APPLICATION_KEY
+echo "  "
+echo "  You can verify the service principal was created properly by running:"
+echo "  az login --username="$APP_ID" --service-principal --tenant=$TENANT_ID" --password="$APPLICATION_KEY"
+echo "  "
