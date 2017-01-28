@@ -10,7 +10,7 @@ APPLICATION_NAME="app${app_uuid}"
 APPLICATION_URI="${APPLICATION_NAME}_id"
 APPLICATION_KEY=$(python -c 'import uuid; print uuid.uuid4().hex')
 TENANT_ID=""
-SUBSCRIPTION_NAME="Dev Ops_events_dcaro"
+SUBSCRIPTION_NAME=""
 
 while [[ $# -gt 1 ]]
 do
