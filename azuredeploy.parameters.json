@@ -2,31 +2,40 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "username": {
+    "resourceIndex": {
+      "value": "00"
+    },
+    "vmUserName": {
       "value": "your-linux-admin-userid"
     },
-    "password": {
+    "vmPassword": {
       "value": "your-linux-admin-password"
     },
-    "newStorageAccountName": {
+    "vhdStorageAccountName": {
       "value": "your-vhd-storage-account-name"
     },
-    "SpinnakerVMSize": {
+    "spinnakerVMSize": {
       "value": "Standard_D2"
     },
-    "dnsNameForPublicIP": {
+    "jenkinsVMSize": {
+      "value": "Standard_D2"
+    },
+    "spinnakerDnsPrefix": {
       "value": "your-dns-prefix"
     },
-    "subscriptionId": {
+    "jenkinsDnsPrefix": {
+      "value": "your-dns-prefix"
+    },
+    "spnSubscriptionId": {
       "value": "your-subscription-Id"
     },
-    "clientId": {
+    "spnClientId": {
       "value": "your-client-Id"
     },
-    "clientSecret": {
+    "spnClientSecret": {
       "value": "your-client-secret"
     },
-    "tenantId": {
+    "spnTenantId": {
       "value": "your-tenant-Id"
     },
     "packerStorageAccountName": {
@@ -37,6 +46,21 @@
     },
     "keyVaultAccountName": {
       "value": "your-keyvault-account-name"
+    },
+    "OracleUser" : {
+      "value": "your-oracle-account-name"
+    },
+    "OraclePassword" : {
+      "value" : "your-oracle-password"
+    },
+    "JenkinsUser" : {
+      "value" : "your-jenkins-username"
+    },
+    "JenkinsPassword" : { 
+      "value" : "your-jenkins-password"
+    },
+    "AptlyRepoName" : {
+      "value" : "your-aptly-repository-name"
     }
   }
 }

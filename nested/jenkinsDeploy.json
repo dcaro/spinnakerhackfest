@@ -1,0 +1,194 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "JenkinsVM": {
+            "type": "object",
+            "metadata": {
+                "Description": "StorageAccountName (string): name of storage account into which VHDs will be placed. "
+            }
+        },
+        "Keyvault": {
+            "type": "object",
+            "metadata": {
+                "Description": "A keyvault and a few secrets."
+            }
+        },
+        "Account": {
+            "type": "object",
+            "metadata": {
+                "Description": "The username and password to initial Jenkins setup."
+            }
+        }
+    },
+    "variables": {
+        "scenarioPrefix": "jenkins",
+        "VM": {
+            "name": "Jenkins",
+            "publisher": "MicrosoftVisualStudio",
+            "offer": "VisualStudio",
+            "sku": "Azure-Jenkins-012",
+            "version": "latest"
+        },
+        "OSDiskName": "[concat(variables('scenarioPrefix'),'OSDisk')]",
+        "templateAPIVersion": "2016-09-01",
+        "networkAPIVersion": "2016-03-30",
+        "keyvaultAPIVersion": "2015-06-01",
+        "computeAPIVersion": "2016-03-30",
+        "publicIPAddressType": "Dynamic",
+        "nicName": "[concat(variables('scenarioPrefix'), 'Nic')]",
+        "vmName": "[concat(variables('scenarioPrefix'), 'Vm')]",
+        "JenkinsCredentials": {
+            "adminUsername": "jenkins",
+            "adminPassword": "Passw0rd"
+        },
+        "JenkinsCustomScript": {
+            "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_jenkins.sh",
+            "commandToExecute": "bash set_azure_jenkins.sh"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('networkAPIVersion')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[parameters('JenkinsVM').publicIPAddressName]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('JenkinsVM').dnsPrefix]"
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('networkAPIVersion')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "nsgJenkins",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ssh_rule",
+                        "properties": {
+                            "description": "Allow SSH",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "portal_rule",
+                        "properties": {
+                            "description": "Allow portal",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "8080",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('networkAPIVersion')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('JenkinsVM').publicIPAddressName)]",
+                "Microsoft.Network/networkSecurityGroups/nsgJenkins"
+            ],
+            "properties": {
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/','nsgJenkins')]"
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('JenkinsVM').privateIp]",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('JenkinsVM').publicIPAddressName)]"
+                            },
+                            "subnet": {
+                                "id": "[parameters('JenkinsVM').subnet0Ref]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('computeAPIVersion')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('vmName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('JenkinsVM').vmSize]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmName')]",
+                    "adminUsername": "[parameters('Keyvault').userName]",
+                    "adminPassword": "[parameters('Keyvault').password]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('VM').publisher]",
+                        "offer": "[variables('VM').offer]",
+                        "sku": "[variables('VM').sku]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat('http://', parameters('JenkinsVM').StorageAccountName, '.blob.core.windows.net/', parameters('JenkinsVM').StorageAccountContainerName, '/', variables('OSDiskName'), '.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/JenkinsCustomScript')]",
+            "apiVersion": "[variables('computeAPIVersion')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[split(variables('JenkinsCustomScript').fileUris, ' ')]",
+                    "commandToExecute": "[concat(variables('JenkinsCustomScript').commandToExecute, ' ', variables('JenkinsCredentials').adminUserName, ' ', variables('JenkinsCredentials').adminPassword, ' ', parameters('Account').OracleUser, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName)]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

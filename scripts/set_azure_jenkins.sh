@@ -5,29 +5,23 @@ CONFIG_AZURE_SCRIPT="config_azure.sh"
 CLEAN_STORAGE_SCRIPT="clear_storage_config.sh"
 CREATE_STORAGE_SCRIPT="config_azure_jenkins_storage.sh"
 CREATE_SERVICE_PRINCIPAL_SCRIPT="create_service_principal.sh"
-SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
-JENKINS_USER="/var/lib/jenkins/users/"
+INITIAL_JENKINS_CONFIG="init_jenkins.sh"
+APTLY_SCRIPT="setup_aptly.sh"
+JENKINS_GROOVY="init.groovy"
 JENKINS_HOME="/var/lib/jenkins/"
-JENKINS_CONFIG="config.xml"
-ADMINUSER=$1
-ADMINPWD=$2
-
-#download jenkins-cli and secured jenkins config to create new user
-wget -O /opt/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar
-chmod +x /opt/jenkins-cli.jar
+#SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
+SOURCE_URI="https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/setup-scripts/"
+ORACLE_USER="$3"
+ORACLE_PASSWORD="$4"
+JENKINS_USER="$1"
+JENKINS_PWD="$2"
+APTLY_REPO_NAME="$5"
 
 #delete any previous user if there is any
-if [ ! -d $JENKINS_USER ] 
+if [ ! -d $JENKINS_USER ]
 then
     sudo rm -rvf $JENKINS_USER
 fi
-#create adminuser and password
-echo "hpsr=new hudson.security.HudsonPrivateSecurityRealm(false); hpsr.createAccount('$ADMINUSER', '$ADMINPWD')" | sudo java -jar /opt/jenkins-cli.jar -s http://localhost:8080 groovy =
-
-#enable secure jenkins secure config
-sudo mv /var/lib/jenkins/config.xml /var/lib/jenkins/config.xml.bak
-sudo wget -O /var/lib/jenkins/config.xml https://arroycsafestorage.blob.core.windows.net/testsafe/config.xml
-
 #restart jenkins
 sudo service jenkins restart
 
@@ -51,9 +45,41 @@ sudo chmod +x $SETUP_SCRIPTS_LOCATION$CREATE_STORAGE_SCRIPT
 sudo wget -O $SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT $SOURCE_URI$CREATE_SERVICE_PRINCIPAL_SCRIPT
 sudo chmod +x $SETUP_SCRIPTS_LOCATION$CREATE_SERVICE_PRINCIPAL_SCRIPT
 
-#delete any existing config script
+# Download init_jenkins config script
+sudo wget -O $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG $SOURCE_URI$INITIAL_JENKINS_CONFIG
+sudo chmod +x $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+
+# Download Jenkins Groovy script
+sudo wget -O $SETUP_SCRIPTS_LOCATION$JENKINS_GROOVY $SOURCE_URI$JENKINS_GROOVY
+# sudo wget -O $JENKINS_HOME$JENKINS_GROOVY $SOURCE_URI$JENKINS_GROOVY
+# sudo chown jenkins:jenkins $JENKINS_HOME$JENKINS_GROOVY
+
+# Download aptly setup script
+sudo wget -O $SETUP_SCRIPTS_LOCATION$APTLY_SCRIPT $SOURCE_URI$APTLY_SCRIPT
+sudo chmod +x $SETUP_SCRIPTS_LOCATION$APTLY_SCRIPT
+
+# Delete any existing config script
 old_config_storage_file="/opt/azure_jenkins_config/config_storage.sh"
 if [ -f $old_config_storage_file ]
 then
   sudo rm -f $old_config_storage_file
 fi
+
+# Installing git 
+sudo apt-get install git -y
+
+# Replace the Oracle username and password in the init script
+SED_STRING3='s/ORACLE_USER=\"\"/ORACLE_USER=\"'$ORACLE_USER'\"/'
+sudo sed -i $SED_STRING3 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+
+SED_STRING4='s/ORACLE_PASSWORD=\"\"/ORACLE_PASSWORD=\"'$ORACLE_PASSWORD'\"/'
+sudo sed -i $SED_STRING4 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+
+SED_STRING1='s/JENKINS_USER=\"\"/JENKINS_USER=\"'$JENKINS_USER'\"/'
+sudo sed -i $SED_STRING1 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+
+SED_STRING2='s/JENKINS_PWD=\"\"/JENKINS_PWD=\"'$JENKINS_PWD'\"/'
+sudo sed -i $SED_STRING2 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+
+SED_STRING5='s/APTLY_REPO_NAME=\"\"/APTLY_REPO_NAME=\"'$APTLY_REPO_NAME'\"/'
+sudo sed -i $SED_STRING5 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG

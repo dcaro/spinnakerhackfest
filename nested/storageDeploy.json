@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "StorageAccount": {
+            "type": "object"
+        },
+        "PackerStorageAccount": {
+            "type": "object"
+        }
+    },
+    "variables": {
+        "storageAPIVersion": "2016-01-01"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('StorageAccount').name]",
+            "apiVersion": "[variables('StorageAPIVersion')]",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "[parameters('StorageAccount').type]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('PackerStorageAccount').name]",
+            "apiVersion": "[variables('StorageAPIVersion')]",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "[parameters('PackerStorageAccount').type]"
+            }
+        }
+    ]
+}
