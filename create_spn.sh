@@ -2,6 +2,12 @@
 
 # Add jq
 # sudo apt-get install jq -y 
+PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' jq|grep "install ok installed")
+echo Checking for jq: $PKG_INSTALLED
+if [ "" == "$PKG_INSTALLED" ]; then
+  echo "No jq installed. installing jq..."
+  sudo apt-get --force-yes --yes install jq
+fi
 
 # Default values 
 app_uuid=$(python -c 'import uuid; print str(uuid.uuid4())[:8]')
