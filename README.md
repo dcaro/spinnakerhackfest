@@ -6,6 +6,8 @@ This template will allow the automated deployment of Jenkins + Spinnaker in two 
 In order to deploy here are the steps to follow: 
 
 1- Create a Service Principal name
+  A. Using the az cli, login to your subscription.
+  B. Run the script ./create_spn.sh passing in the name of your subscription as a parameter (-n parameter).  See script for usage documentation regarding optional parameters.
 
 2- Create a resource groups
 
