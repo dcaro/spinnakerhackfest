@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Usage : ./init_jenkins.sh -ou oracleuser@oracle.com -op oraclepassword -gu githubuser -gp githubpass -ju jenkins -jp Passw0rd
+# -n  : (REQUIRED) the subscription name to create the spn in
+# -d  : (OPTIONAL) the display name to use for the application. If not present, value will be generated. 
+# -h  : (OPTIONAL) the application homepage.  If not present, value will be generated. 
+# -u  : (OPTIONAL) the application auth uri.  If not present, value will be generated. 
+# -p  : (OPTIONAL) the application password.  If not present, value will be generated.  
+# -t  : (OPTIONAL) the tenant id.  If not present, value will be generated. 
+
 # Check if jq installed, if not, install it.
 PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' jq|grep "install ok installed")
 echo Checking for jq: $PKG_INSTALLED
