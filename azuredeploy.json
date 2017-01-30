@@ -157,6 +157,7 @@
         "templateAPIVersion": "2016-09-01",
         "templateBaseUrl": "[concat(parameters('templateLocation'), '/')]",
         "storageAccountName": "[concat(parameters('vhdStorageAccountName'), parameters('resourceIndex'))]",
+        "storageAccountfront50": "[concat(parameters('vhdStorageAccountName'), 'front' ,parameters('resourceIndex'))]",
         "storageAccountContainerName": "vhds",
         "spinnakerTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'spinnakerDeploy.json')]",
         "storageTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'storageDeploy.json')]",
@@ -190,6 +191,12 @@
                     "PackerStorageAccount": {
                         "value": {
                             "name": "[concat(parameters('packerStorageAccountName'), parameters('resourceIndex'))]",
+                            "type": "Standard_LRS"
+                        }
+                    },
+                    "Front50StorageAccount": {
+                        "value": {
+                            "name": "[variables('storageAccountfront50')]",
                             "type": "Standard_LRS"
                         }
                     }
@@ -311,5 +318,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "result": {
+            "type": "object",
+            "value": "[reference('storage-deployment').outputs.result]"
+        }
+    }
 }

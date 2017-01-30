@@ -7,6 +7,9 @@
         },
         "PackerStorageAccount": {
             "type": "object"
+        },
+        "front50StorageAccount": {
+            "type": "object"
         }
     },
     "variables": {
@@ -32,6 +35,22 @@
             "sku": {
                 "name": "[parameters('PackerStorageAccount').type]"
             }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('front50StorageAccount').name]",
+            "apiVersion": "[variables('StorageAPIVersion')]",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "[parameters('front50StorageAccount').type]"
+            }
         }
-    ]
+    ],
+    "outputs": {
+        "listKeysOutput": {
+            "type": "string",
+            "value": "listKeys(resourceId('Microsot.Storage/storageAccounts',parameters('front50StorageAccount').name), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
+        }
+    }
 }
