@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# Add jq
-# sudo apt-get install jq -y 
+# Check if jq installed, if not, install it.
+PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' jq|grep "install ok installed")
+echo Checking for jq: $PKG_INSTALLED
+if [ "" == "$PKG_INSTALLED" ]; then
+  echo "No jq installed. installing jq..."
+  sudo apt-get --force-yes --yes install jq
+fi
 
 # Default values 
 app_uuid=$(python -c 'import uuid; print str(uuid.uuid4())[:8]')
@@ -55,10 +60,26 @@ echo " Application Name: "$APPLICATION_NAME
 echo " Application Uri: "$APPLICATION_URI
 echo " Application Key: "$APPLICATION_KEY
 
+#Validate the subscription
+echo "Validating subscription info"
+if [ -z "$SUBSCRIPTION_NAME" ]
+then
+    echo "  Subscription name parameter not present"
+    exit 1  
+fi
+
+#obtain the azure account, if no account returned, invalid name.
+AZURE_ACCOUNT=$(az account show --subscription "$SUBSCRIPTION_NAME")
+
+if [ -z "$AZURE_ACCOUNT" ]
+then
+    echo "Invalid subscription name, no account found."
+    exit 1
+fi
+
 # Obtain the tenantId of the subscriptions
 if [ -z "$TENANT_ID" ]
 then
-    AZURE_ACCOUNT=$(az account show --subscription "$SUBSCRIPTION_NAME")
     echo $AZURE_ACCOUNT
     TENANT_ID=$(echo $AZURE_ACCOUNT | jq .tenantId | sed 's/"//g')
     SUBSCRIPTION_ID=$(echo $AZURE_ACCOUNT | jq .id | sed 's/"//g')
