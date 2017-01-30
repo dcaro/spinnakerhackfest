@@ -50,7 +50,7 @@
     "outputs": {
         "storageKey": {
             "type": "object",
-            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('front50StorageAccount').name),'2016-01-01')]"
+            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('front50StorageAccount').name),variables('StorageAPIVersion'))]"
         }
     }
 }

@@ -321,7 +321,7 @@
     "outputs": {
         "listKeysOutput": {
             "type": "string",
-            "value": "[listKeys(reference('storage-deployment').outputs.storageKey.keys[0].value)]"
+            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountfront50')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
         }
     }
 }
