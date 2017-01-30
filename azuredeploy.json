@@ -321,7 +321,7 @@
     "outputs": {
         "listKeysOutput": {
             "type": "object",
-            "value": "[reference('storage-deployment').outputs.result]"
+            "value": "[reference('storage-deployment').outputs.listKeysOutput]"
         }
     }
 }
