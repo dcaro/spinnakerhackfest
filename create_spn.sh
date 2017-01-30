@@ -8,9 +8,6 @@ if [ "" == "$PKG_INSTALLED" ]; then
   sudo apt-get --force-yes --yes install jq
 fi
 
-#Check valid subscription ID passed in.
-
-
 # Default values 
 app_uuid=$(python -c 'import uuid; print str(uuid.uuid4())[:8]')
 DISPLAY_NAME="spinnaker"
@@ -74,7 +71,7 @@ fi
 #obtain the azure account, if no account returned, invalid name.
 AZURE_ACCOUNT=$(az account show --subscription "$SUBSCRIPTION_NAME")
 
-if [ -z $AZURE_ACCOUNT ]
+if [ -z "$AZURE_ACCOUNT" ]
 then
     echo "Invalid subscription name, no account found."
 fi
