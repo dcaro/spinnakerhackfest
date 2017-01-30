@@ -320,8 +320,8 @@
     ],
     "outputs": {
         "listKeysOutput": {
-            "type": "object",
-            "value": "[reference('storage-deployment').outputs.listKeysOutput]"
+            "type": "string",
+            "value": "[listKeys(reference('storage-deployment').outputs.storageKey).keys[0].value)]"
         }
     }
 }

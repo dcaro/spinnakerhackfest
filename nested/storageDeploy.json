@@ -48,9 +48,9 @@
         }
     ],
     "outputs": {
-        "listKeysOutput": {
-            "type": "string",
-            "value": "listKeys(resourceId('Microsoft.Storage/storageAccounts',parameters('front50StorageAccount').name), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
+        "storageKey": {
+            "type": "object",
+            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('front50StorageAccount').name),'2016-01-01')]"
         }
     }
 }
