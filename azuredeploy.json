@@ -313,7 +313,9 @@
                         "value": {
                             "OracleUser": "[parameters('OracleUser')]",
                             "OraclePassword": "[parameters('OraclePassword')]",
-                            "AptlyRepoName": "[parameters('AptlyRepoName')]"
+                            "AptlyRepoName": "[parameters('AptlyRepoName')]",
+                            "JenkinsUser": "[parameters('JenkinsUser')]",
+                            "JenkinsPassword": "[parameters('JenkinsPassword')]"
                         }
                     }
                 }
