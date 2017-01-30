@@ -74,6 +74,7 @@ AZURE_ACCOUNT=$(az account show --subscription "$SUBSCRIPTION_NAME")
 if [ -z "$AZURE_ACCOUNT" ]
 then
     echo "Invalid subscription name, no account found."
+    exit 1
 fi
 
 # Obtain the tenantId of the subscriptions
