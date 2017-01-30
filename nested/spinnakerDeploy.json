@@ -55,6 +55,10 @@
         "keyVault": {
             "resourceGroupName": "[concat(' -r ', resourceGroup().name)]",
             "keyVaultName": "[concat(' -k ', parameters('Keyvault').name)]"
+        },
+        "front50": {
+            "storageAccount": "[concat('-f', parameters('SpinnakerVM').Front50StorageAccountName)]",
+            "StorageKey": "[concat('-a', parameters('SpinnakerVM').StorageKey)]"
         }
     },
     "resources": [
@@ -235,7 +239,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": "[split(variables('SpinnakerCustomScript').fileUris, ' ')]",
-                    "commandToExecute": "[concat(variables('SpinnakerCustomScript').commandToExecute, variables('credentials').subscriptionId, variables('credentials').tenantId, variables('credentials').clientId, variables('credentials').clientSecret, variables('packer').resourceGroupName, variables('packer').storageAccountName, variables('keyVault').resourceGroupName, variables('keyVault').keyVaultName)]"
+                    "commandToExecute": "[concat(variables('SpinnakerCustomScript').commandToExecute, variables('credentials').subscriptionId, variables('credentials').tenantId, variables('credentials').clientId, variables('credentials').clientSecret, variables('packer').resourceGroupName, variables('packer').storageAccountName, variables('keyVault').resourceGroupName, variables('keyVault').keyVaultName, variables('front50').storageAccount, variables('front50').StorageKey]"
                 }
             }
         }

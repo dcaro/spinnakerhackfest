@@ -252,7 +252,9 @@
                             "publicIPAddressName": "[concat('spinnakerPublicIp', parameters('resourceIndex'))]",
                             "vmSize": "[parameters('spinnakerVMSize')]",
                             "subnet0Ref": "[variables('subnet0Ref')]",
-                            "privateIp": "10.0.0.4"
+                            "privateIp": "10.0.0.4",
+                            "StorageKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountfront50')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+                            "Front50StorageAccountNane": "[variables('storageAccountfront50')]"
                         }
                     },
                     "Keyvault": {
