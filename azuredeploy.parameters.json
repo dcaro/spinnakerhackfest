@@ -41,9 +41,6 @@
     "packerStorageAccountName": {
       "value": "your-packer-storage-account-name"
     },
-    "packerResourceGroupName": {
-      "value": "your-packer-resource-group-name"
-    },
     "keyVaultAccountName": {
       "value": "your-keyvault-account-name"
     },
