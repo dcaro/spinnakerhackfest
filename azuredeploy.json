@@ -194,7 +194,7 @@
                             "type": "Standard_LRS"
                         }
                     },
-                    "Front50StorageAccount": {
+                    "front50StorageAccount": {
                         "value": {
                             "name": "[variables('storageAccountfront50')]",
                             "type": "Standard_LRS"
