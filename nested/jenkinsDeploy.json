@@ -39,8 +39,8 @@
         "nicName": "[concat(variables('scenarioPrefix'), 'Nic')]",
         "vmName": "[concat(variables('scenarioPrefix'), 'Vm')]",
         "JenkinsCredentials": {
-            "adminUsername": "[parameters(Account).JenkinsUser]",
-            "adminPassword": "[parameters(Account).JenkinsPassword]"
+            "adminUsername": "[parameters('Account').JenkinsUser]",
+            "adminPassword": "[parameters('Account').JenkinsPassword]"
         },
         "JenkinsCustomScript": {
             "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_jenkins.sh",
