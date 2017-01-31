@@ -253,7 +253,7 @@
                             "vmSize": "[parameters('spinnakerVMSize')]",
                             "subnet0Ref": "[variables('subnet0Ref')]",
                             "privateIp": "10.0.0.4",
-                            "StorageKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountfront50')), '2016-12-01').keys[1].value]",
+                            "StorageKey": "[reference('storage-deployment').outputs.storageKey.value]",
                             "Front50StorageAccountNane": "[variables('storageAccountfront50')]"
                         }
                     },
@@ -325,7 +325,7 @@
     "outputs": {
         "listKeysOutput": {
             "type": "string",
-            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountfront50')), variables('templateAPIVersion')).keys[0].value]"
+            "value": "[reference('storage-deployment').outputs.storageKey.value]"
         }
     }
 }
