@@ -7,7 +7,7 @@
 JENKINS_USERNAME="jenkins"
 JENKINS_PASSWORD="Passw0rd"
 
-while getopts ":t:s:p:c:g:h:r:k:b:j:u:q:" opt; do
+while getopts ":t:s:p:c:h:r:l:k:b:j:u:q:" opt; do
   case $opt in
     t) TENANTID="$OPTARG"
     ;;
@@ -17,11 +17,11 @@ while getopts ":t:s:p:c:g:h:r:k:b:j:u:q:" opt; do
     ;;
     s) SUBSCRIPTIONID="$OPTARG"
     ;;
-    g) PACKERRESOURCEGROUP="$OPTARG"
-    ;;
     h) PACKERSTORAGEACCOUNT="$OPTARG"
     ;;
     r) RESOURCEGROUP="$OPTARG"
+    ;;
+    l) RESOURCEGROUPLOCATION="$OPTARG"
     ;;
     k) KEYVAULT="$OPTARG"
     ;;
@@ -45,16 +45,15 @@ WORKDIR=$(pwd)
 JENKINS_URL='http:\/\/10.0.0.5'
 DEBUG_FILE=$WORKDIR"/debugfile"
 SED_FILE=$WORKDIR"/sedCommand.sed"
-SPINNAKER_ENTRY=$WORKDIR"/spinnaker.inputs"
 
 # Record the Variables in text file for debugging purposes  
 sudo printf "TENANTID=%s\n" $TENANTID > $DEBUG_FILE
 sudo printf "PASSWORD=%s\n" $PASSWORD >> $DEBUG_FILE
 sudo printf "CLIENTID=%s\n" $CLIENTID >> $DEBUG_FILE
 sudo printf "SUBSCRIPTIONID=%s\n" $SUBSCRIPTIONID >> $DEBUG_FILE
-sudo printf "PACKERRESOURCEGROUP=%s\n" $PACKERRESOURCEGROUP >> $DEBUG_FILE
 sudo printf "PACKERSTORAGEACCOUNT=%s\n" $PACKERSTORAGEACCOUNT >> $DEBUG_FILE
 sudo printf "RESOURCEGROUP=%s\n" $RESOURCEGROUP >> $DEBUG_FILE
+sudo printf "RESOURCEGROUPLOCATION=%s\n" $RESOURCEGROUPLOCATION >> $DEBUG_FILE
 sudo printf "KEYVAULT=%s\n" $KEYVAULT >> $DEBUG_FILE
 sudo printf "JENKINS_URL=%s\n" $JENKINS_URL >> $DEBUG_FILE
 
@@ -73,9 +72,9 @@ sudo printf "apt-get upgrade completed\n" >> $DEBUG_FILE
 
 # Install Spinnaker on the VM
 sudo printf "Starting to install Spinnaker\n" >> $DEBUG_FILE
-sudo printf "azure\nwestus\n" > $SPINNAKER_ENTRY
-sudo bash -xc "$(curl -s https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh)" < $SPINNAKER_ENTRY 
-sudo printf "Spinnaked has been installed\n" >> $DEBUG_FILE
+curl --silent https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh | sudo bash -s -- --cloud_provider azure --azure_region $RESOURCEGROUPLOCATION
+
+sudo printf "Spinnaker has been installed\n" >> $DEBUG_FILE
 
 # Configuring the /opt/spinnaker/config/default-spinnaker-local.yml
 # Let's create the sed command file and run the sed command
@@ -88,7 +87,7 @@ sudo printf "s/appKey:$/& %s/\n" $PASSWORD >> $SED_FILE
 sudo printf "s/tenantId:$/& %s/\n" $TENANTID >> $SED_FILE
 sudo printf "s/subscriptionId:$/& %s/\n" $SUBSCRIPTIONID >> $SED_FILE
 # Adding the PackerResourceGroup, the PackerStorageAccount, the defaultResourceGroup and the defaultKeyVault  
-sudo printf "s/packerResourceGroup:$/& %s/\n" $PACKERRESOURCEGROUP >> $SED_FILE
+sudo printf "s/packerResourceGroup:$/& %s/\n" $RESOURCEGROUP >> $SED_FILE
 sudo printf "s/packerStorageAccount:$/& %s/\n" $PACKERSTORAGEACCOUNT >> $SED_FILE
 sudo printf "s/defaultResourceGroup:$/& %s/\n" $RESOURCEGROUP >> $SED_FILE
 sudo printf "s/defaultKeyVault:$/& %s/\n" $KEYVAULT >> $SED_FILE

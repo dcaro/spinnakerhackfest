@@ -2,17 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "resourceIndex": {
-      "value": "00"
-    },
     "vmUserName": {
-      "value": "your-linux-admin-userid"
+      "value": "GEN-USERNAME"
     },
     "vmPassword": {
-      "value": "your-linux-admin-password"
-    },
-    "vhdStorageAccountName": {
-      "value": "your-vhd-storage-account-name"
+      "value": "GEN-PASSWORD"
     },
     "spinnakerVMSize": {
       "value": "Standard_D2"
@@ -21,40 +15,25 @@
       "value": "Standard_D2"
     },
     "spinnakerDnsPrefix": {
-      "value": "your-dns-prefix"
+      "value": "GEN-UNIQUE"
     },
     "jenkinsDnsPrefix": {
-      "value": "your-dns-prefix"
-    },
-    "spnSubscriptionId": {
-      "value": "your-subscription-Id"
+      "value": "GEN-UNIQUE"
     },
     "spnClientId": {
-      "value": "your-client-Id"
+      "value": "GEN-UNIQUE-18"
     },
     "spnClientSecret": {
-      "value": "your-client-secret"
-    },
-    "spnTenantId": {
-      "value": "your-tenant-Id"
-    },
-    "packerStorageAccountName": {
-      "value": "your-packer-storage-account-name"
+      "value": "GEN-PASSWORD"
     },
     "keyVaultAccountName": {
-      "value": "your-keyvault-account-name"
+      "value": "GEN-UNIQUE"
     },
-    "OracleUser" : {
-      "value": "your-oracle-account-name"
+    "OracleUserName" : {
+      "value": "GEN-USERNAME"
     },
     "OraclePassword" : {
-      "value" : "your-oracle-password"
-    },
-    "JenkinsUser" : {
-      "value" : "your-jenkins-username"
-    },
-    "JenkinsPassword" : { 
-      "value" : "your-jenkins-password"
+      "value" : "GEN-PASSWORD"
     },
     "AptlyRepoName" : {
       "value" : "your-aptly-repository-name"
