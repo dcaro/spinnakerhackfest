@@ -103,7 +103,7 @@
         },
         "templateLocation": {
             "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master",
+            "defaultValue": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/dev",
             "metadata": {
                 "description": "Template file location",
                 "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
@@ -157,6 +157,7 @@
         "templateAPIVersion": "2016-09-01",
         "templateBaseUrl": "[concat(parameters('templateLocation'), '/')]",
         "storageAccountName": "[concat(parameters('vhdStorageAccountName'), parameters('resourceIndex'))]",
+        "storageAccountfront50": "[concat(parameters('vhdStorageAccountName'), 'front' ,parameters('resourceIndex'))]",
         "storageAccountContainerName": "vhds",
         "spinnakerTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'spinnakerDeploy.json')]",
         "storageTemplateUrl": "[concat(variables('templateBaseUrl'), 'nested/', 'storageDeploy.json')]",
@@ -190,6 +191,12 @@
                     "PackerStorageAccount": {
                         "value": {
                             "name": "[concat(parameters('packerStorageAccountName'), parameters('resourceIndex'))]",
+                            "type": "Standard_LRS"
+                        }
+                    },
+                    "front50StorageAccount": {
+                        "value": {
+                            "name": "[variables('storageAccountfront50')]",
                             "type": "Standard_LRS"
                         }
                     }
@@ -245,7 +252,9 @@
                             "publicIPAddressName": "[concat('spinnakerPublicIp', parameters('resourceIndex'))]",
                             "vmSize": "[parameters('spinnakerVMSize')]",
                             "subnet0Ref": "[variables('subnet0Ref')]",
-                            "privateIp": "10.0.0.4"
+                            "privateIp": "10.0.0.4",
+                            "StorageKey": "[reference('storage-deployment').outputs.storageKey.value]",
+                            "Front50StorageAccountName": "[variables('storageAccountfront50')]"
                         }
                     },
                     "Keyvault": {
@@ -304,12 +313,19 @@
                         "value": {
                             "OracleUser": "[parameters('OracleUser')]",
                             "OraclePassword": "[parameters('OraclePassword')]",
-                            "AptlyRepoName": "[parameters('AptlyRepoName')]"
+                            "AptlyRepoName": "[parameters('AptlyRepoName')]",
+                            "JenkinsUser": "[parameters('JenkinsUser')]",
+                            "JenkinsPassword": "[parameters('JenkinsPassword')]"
                         }
                     }
                 }
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "listKeysOutput": {
+            "type": "string",
+            "value": "[reference('storage-deployment').outputs.storageKey.value]"
+        }
+    }
 }

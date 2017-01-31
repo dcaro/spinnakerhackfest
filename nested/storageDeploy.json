@@ -7,12 +7,25 @@
         },
         "PackerStorageAccount": {
             "type": "object"
+        },
+        "front50StorageAccount": {
+            "type": "object"
         }
     },
     "variables": {
         "storageAPIVersion": "2016-01-01"
     },
     "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('front50StorageAccount').name]",
+            "apiVersion": "[variables('StorageAPIVersion')]",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "[parameters('front50StorageAccount').type]"
+            }
+        },
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('StorageAccount').name]",
@@ -33,5 +46,11 @@
                 "name": "[parameters('PackerStorageAccount').type]"
             }
         }
-    ]
+    ],
+    "outputs": {
+        "storageKey": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('front50StorageAccount').name),variables('StorageAPIVersion')).keys[0].value]"
+        }
+    }
 }

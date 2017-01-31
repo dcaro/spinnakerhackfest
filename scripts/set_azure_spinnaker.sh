@@ -33,6 +33,10 @@ while getopts ":t:s:p:c:g:h:r:k:b:j:u:q:" opt; do
     ;;
     q) JENKINS_PASSWORD="$OPTARG"
     ;;
+    f) FRONT50_STORAGE="$OPTARG"
+    ;;
+    a) FRONT50_KEY="$OPTARG"
+    ;;
   esac
 done
 
