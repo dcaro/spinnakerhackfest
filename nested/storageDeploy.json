@@ -18,6 +18,16 @@
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('front50StorageAccount').name]",
+            "apiVersion": "[variables('StorageAPIVersion')]",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "[parameters('front50StorageAccount').type]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('StorageAccount').name]",
             "apiVersion": "[variables('StorageAPIVersion')]",
             "location": "[resourceGroup().location]",
@@ -34,16 +44,6 @@
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('PackerStorageAccount').type]"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "[parameters('front50StorageAccount').name]",
-            "apiVersion": "[variables('StorageAPIVersion')]",
-            "location": "[resourceGroup().location]",
-            "kind": "Storage",
-            "sku": {
-                "name": "[parameters('front50StorageAccount').type]"
             }
         }
     ],
