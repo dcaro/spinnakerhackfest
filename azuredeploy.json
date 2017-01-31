@@ -254,7 +254,7 @@
                             "subnet0Ref": "[variables('subnet0Ref')]",
                             "privateIp": "10.0.0.4",
                             "StorageKey": "[reference('storage-deployment').outputs.storageKey.value]",
-                            "Front50StorageAccountNane": "[variables('storageAccountfront50')]"
+                            "Front50StorageAccountName": "[variables('storageAccountfront50')]"
                         }
                     },
                     "Keyvault": {
