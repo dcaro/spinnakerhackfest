@@ -2,55 +2,52 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "StorageAccount": {
-            "type": "object"
+        "storageAccountName": {
+            "type": "string"
         },
-        "PackerStorageAccount": {
-            "type": "object"
+        "packerStorageAccountName": {
+            "type": "string"
         },
-        "front50StorageAccount": {
-            "type": "object"
+        "front50StorageAccountName": {
+            "type": "string"
         }
     },
-    "variables": {
-        "storageAPIVersion": "2016-01-01"
-    },
     "resources": [
-        {
+      {
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[parameters('front50StorageAccount').name]",
-            "apiVersion": "[variables('StorageAPIVersion')]",
+            "name": "[parameters('front50StorageAccountName')]",
+            "apiVersion": "2016-01-01",
             "location": "[resourceGroup().location]",
             "kind": "Storage",
             "sku": {
-                "name": "[parameters('front50StorageAccount').type]"
+                "name": "Standard_LRS"
             }
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[parameters('StorageAccount').name]",
-            "apiVersion": "[variables('StorageAPIVersion')]",
+            "name": "[parameters('storageAccountName')]",
+            "apiVersion": "2016-01-01",
             "location": "[resourceGroup().location]",
             "kind": "Storage",
             "sku": {
-                "name": "[parameters('StorageAccount').type]"
+                "name": "Standard_LRS"
             }
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[parameters('PackerStorageAccount').name]",
-            "apiVersion": "[variables('StorageAPIVersion')]",
+            "name": "[parameters('packerStorageAccountName')]",
+            "apiVersion": "2016-01-01",
             "location": "[resourceGroup().location]",
             "kind": "Storage",
             "sku": {
-                "name": "[parameters('PackerStorageAccount').type]"
+                "name": "Standard_LRS"
             }
         }
     ],
     "outputs": {
         "storageKey": {
             "type": "string",
-            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('front50StorageAccount').name),variables('StorageAPIVersion')).keys[0].value]"
+            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('front50StorageAccountName')), '2016-01-01').keys[0].value]"
         }
     }
 }

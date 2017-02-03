@@ -19,51 +19,39 @@
             "metadata": {
                 "Description": "The username and password to initial Jenkins setup."
             }
+        },
+        "_artifactsLocation": {
+          "type": "string"
+        },
+        "_artifactsLocationSasToken": {
+          "type": "securestring"
         }
     },
     "variables": {
         "scenarioPrefix": "jenkins",
-        "VM": {
-            "name": "Jenkins",
-            "publisher": "MicrosoftVisualStudio",
-            "offer": "VisualStudio",
-            "sku": "Azure-Jenkins-012",
-            "version": "latest"
-        },
+        "publicIPAddressName": "[concat(variables('scenarioPrefix'), 'PublicIP')]",
         "OSDiskName": "[concat(variables('scenarioPrefix'),'OSDisk')]",
-        "templateAPIVersion": "2016-09-01",
-        "networkAPIVersion": "2016-03-30",
-        "keyvaultAPIVersion": "2015-06-01",
-        "computeAPIVersion": "2016-03-30",
-        "publicIPAddressType": "Dynamic",
         "nicName": "[concat(variables('scenarioPrefix'), 'Nic')]",
-        "vmName": "[concat(variables('scenarioPrefix'), 'Vm')]",
-        "JenkinsCredentials": {
-            "adminUsername": "[parameters('Account').JenkinsUser]",
-            "adminPassword": "[parameters('Account').JenkinsPassword]"
-        },
-        "JenkinsCustomScript": {
-            "fileUris": "https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/scripts/set_azure_jenkins.sh",
-            "commandToExecute": "bash set_azure_jenkins.sh"
-        }
+        "nsgName": "[concat(variables('scenarioPrefix'), 'NSG')]",
+        "vmName": "[concat(variables('scenarioPrefix'), 'Vm')]"
     },
     "resources": [
         {
-            "apiVersion": "[variables('networkAPIVersion')]",
+            "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[parameters('JenkinsVM').publicIPAddressName]",
+            "name": "[variables('publicIPAddressName')]",
             "location": "[resourceGroup().location]",
             "properties": {
-                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
                     "domainNameLabel": "[parameters('JenkinsVM').dnsPrefix]"
                 }
             }
         },
         {
-            "apiVersion": "[variables('networkAPIVersion')]",
+            "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "nsgJenkins",
+            "name": "[variables('nsgName')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules": [
@@ -99,17 +87,17 @@
             }
         },
         {
-            "apiVersion": "[variables('networkAPIVersion')]",
+            "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', parameters('JenkinsVM').publicIPAddressName)]",
-                "Microsoft.Network/networkSecurityGroups/nsgJenkins"
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
             ],
             "properties": {
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/','nsgJenkins')]"
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
                 },
                 "ipConfigurations": [
                     {
@@ -118,7 +106,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('JenkinsVM').privateIp]",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('JenkinsVM').publicIPAddressName)]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
                             },
                             "subnet": {
                                 "id": "[parameters('JenkinsVM').subnet0Ref]"
@@ -129,12 +117,12 @@
             }
         },
         {
-            "apiVersion": "[variables('computeAPIVersion')]",
+            "apiVersion": "2016-03-30",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('vmName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -147,15 +135,15 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "publisher": "[variables('VM').publisher]",
-                        "offer": "[variables('VM').offer]",
-                        "sku": "[variables('VM').sku]",
+                        "publisher": "MicrosoftVisualStudio",
+                        "offer": "VisualStudio",
+                        "sku": "Azure-Jenkins-012",
                         "version": "latest"
                     },
                     "osDisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat('http://', parameters('JenkinsVM').StorageAccountName, '.blob.core.windows.net/', parameters('JenkinsVM').StorageAccountContainerName, '/', variables('OSDiskName'), '.vhd')]"
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', parameters('JenkinsVM').StorageAccountName), '2016-01-01').primaryEndpoints.blob, parameters('JenkinsVM').StorageAccountContainerName, '/', variables('OSDiskName'), '.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -173,10 +161,10 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/JenkinsCustomScript')]",
-            "apiVersion": "[variables('computeAPIVersion')]",
+            "apiVersion": "2016-03-30",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
             ],
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
@@ -184,8 +172,12 @@
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "fileUris": "[split(variables('JenkinsCustomScript').fileUris, ' ')]",
-                    "commandToExecute": "[concat(variables('JenkinsCustomScript').commandToExecute, ' ', variables('JenkinsCredentials').adminUserName, ' ', variables('JenkinsCredentials').adminPassword, ' ', parameters('Account').OracleUser, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName)]"
+                    "fileUris": [
+                        "[concat(parameters('_artifactsLocation'), 'scripts/set_azure_jenkins.sh', parameters('_artifactsLocationSasToken'))]"
+                    ],
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('Keyvault').userName, ' ', parameters('Keyvault').password, ' ', parameters('Account').OracleUserName, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName)]"
                 }
             }
         }

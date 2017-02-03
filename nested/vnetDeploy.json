@@ -6,12 +6,9 @@
             "type": "object"
         }
     },
-    "variables": {
-        "networkAPIVersion": "2016-03-30"
-    },
     "resources": [
         {
-            "apiVersion": "[variables('networkAPIVersion')]",
+            "apiVersion": "2016-09-01",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[parameters('VirtualNetwork').name]",
             "location": "[resourceGroup().location]",
