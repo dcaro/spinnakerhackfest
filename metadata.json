@@ -1,7 +1,7 @@
 {
-    "itemDisplayName": "Deploy instance of Jenkins targeting Azure Platform",
-    "description": "This template will deploy an instance of the Jenkins CI tool configured to target the Azure platform onto a Linux VM in Azure and ",
-    "summary": "Create a new Linux Ubuntu 14.04 LTS VM with Jenkins, Azure CLI installed to target Azure",
-    "githubUsername": "sebastus",
-    "dateUpdated": "2016-01-11"
+    "itemDisplayName": "Azure CI/CD with Spinnaker and Jenkins",
+    "description": "Deploys instances of Spinnaker and Jenkins CI tools configured to target the Azure platform onto a Linux VM in Azure",
+    "summary": "Create two new Linux Ubuntu 14.04 LTS VM, one with Jenkins, one with Spinnaker, configured to communicate with Azure and between each others",
+    "githubUsername": "dcaro",
+    "dateUpdated": "2017-02-04"
 }
