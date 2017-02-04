@@ -94,6 +94,19 @@
                 "description": "Password of your Oracle account."
             }
         },
+        "JenkinsUser": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of your Jenkins User account."
+            },
+            "defaultValue": "jenkins"
+        },
+        "JenkinsPassword": {
+            "type": "string",
+            "metadata": {
+                "description": "Password of your Jenkins User account."
+            }
+        },
         "AptlyRepoName" : { 
             "type": "string",
             "metadata": {
@@ -253,7 +266,9 @@
                         "value": {
                             "OracleUserName": "[parameters('OracleUserName')]",
                             "OraclePassword": "[parameters('OraclePassword')]",
-                            "AptlyRepoName": "[parameters('AptlyRepoName')]"
+                            "AptlyRepoName": "[parameters('AptlyRepoName')]",
+                            "JenkinsUser": "[parameters('JenkinsUser')]",
+                            "JenkinsPassword": "[parameters('JenkinsPassword')]"
                         }
                     },
                     "_artifactsLocation": { "value": "[parameters('_artifactsLocation')]" },
