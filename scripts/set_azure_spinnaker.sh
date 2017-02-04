@@ -4,8 +4,8 @@
 # clientId : -c 
 # AppKey: -a
 # Default values
-JENKINS_USERNAME="jenkins"
-JENKINS_PASSWORD="Passw0rd"
+JENKINS_USERNAME=""
+JENKINS_PASSWORD=""
 
 while getopts ":t:s:p:c:h:r:l:k:b:j:u:q:" opt; do
   case $opt in
@@ -48,8 +48,8 @@ SED_FILE=$WORKDIR"/sedCommand.sed"
 
 # Record the Variables in text file for debugging purposes  
 sudo printf "TENANTID=%s\n" $TENANTID > $DEBUG_FILE
-sudo printf "PASSWORD=%s\n" $PASSWORD >> $DEBUG_FILE
-sudo printf "CLIENTID=%s\n" $CLIENTID >> $DEBUG_FILE
+sudo printf "SPNCLIENTSECRET=%s\n" $PASSWORD >> $DEBUG_FILE
+sudo printf "SPNCLIENTID=%s\n" $CLIENTID >> $DEBUG_FILE
 sudo printf "SUBSCRIPTIONID=%s\n" $SUBSCRIPTIONID >> $DEBUG_FILE
 sudo printf "PACKERSTORAGEACCOUNT=%s\n" $PACKERSTORAGEACCOUNT >> $DEBUG_FILE
 sudo printf "RESOURCEGROUP=%s\n" $RESOURCEGROUP >> $DEBUG_FILE
@@ -116,7 +116,10 @@ sudo printf "rosco.yml file has been updated\n" >> $DEBUG_FILE
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB9B1D8886F44E2A
 sudo printf "apt-key done\n" >> $DEBUG_FILE
 
+# Removing debug file
+sudo rm -f $DEBUG_FILE
+sudo rm -f $SED_FILE
+
 # rebooting the VM to avoid issues with front50
-sudo printf "Rebooting the system after installation\n" >> $DEBUG_FILE
 sudo shutdown -r now "Rebooting the system after Spinnaker installation" 
 
