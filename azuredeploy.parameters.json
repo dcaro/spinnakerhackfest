@@ -20,10 +20,10 @@
     "jenkinsDnsPrefix": {
       "value": "GEN-UNIQUE"
     },
-    "spnClientId": {
+    "servicePrincipalClientId": {
       "value": "GEN-UNIQUE-18"
     },
-    "spnClientSecret": {
+    "servicePrincipalClientSecret": {
       "value": "GEN-PASSWORD"
     },
     "keyVaultAccountName": {
