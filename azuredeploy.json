@@ -225,6 +225,12 @@
                             "clientSecret": "[parameters('servicePrincipalClientSecret')]"
                         }
                     },
+                    "Account": {
+                        "value": {
+                            "JenkinsUser": "[parameters('JenkinsUser')]",
+                            "JenkinsPassword": "[parameters('JenkinsPassword')]"
+                        }
+                    },
                     "packerStorageAccountName": { "value": "[variables('packerStorageAccountName')]" },
                     "_artifactsLocation": { "value": "[parameters('_artifactsLocation')]" },
                     "_artifactsLocationSasToken": { "value": "[parameters('_artifactsLocationSasToken')]" }
