@@ -54,6 +54,8 @@ done
 
 # Installing Aptly
 $WORKDIR/setup_aptly.sh -ar $APTLY_REPO_NAME
+# Pausing to allow nginx to start completely
+sleep 10
 
 # This script to configure the following stuff from Jenkins automatically: JDK, Oracle user and password, Gradle
 sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://$JENKINS_USER:$JENKINS_PWD@localhost:8080 groovy $WORKDIR/init.groovy $ORACLE_USER $ORACLE_PASSWORD
