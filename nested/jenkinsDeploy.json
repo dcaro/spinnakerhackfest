@@ -82,6 +82,20 @@
                             "priority": 101,
                             "direction": "Inbound"
                         }
+                    },
+                    {
+                        "name": "aptly_rule",
+                        "properties": {
+                            "description": "Allow portal",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "9999",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 102,
+                            "direction": "Inbound"
+                        }
                     }
                 ]
             }
