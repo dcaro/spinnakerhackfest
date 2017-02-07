@@ -41,6 +41,7 @@ done
 WORKDIR=$(pwd)
 # Usually the workdir is /var/lib/waagent/custom-script/download/0
 JENKINS_URL='http:\/\/'$JENKINS_FQDN
+DEBIAN_REPO='http:\/\/ppa.launchpad.net\/openjdk-r\/ppa\/ubuntu trusty main;'$JENKINS_URL
 DEBUG_FILE=$WORKDIR"/debugfile"
 SED_FILE=$WORKDIR"/sedCommand.sed"
 
@@ -106,7 +107,7 @@ sudo sed -i -f $SED_FILE /opt/spinnaker/config/spinnaker-local.yml
 sudo printf "spinnaker-local.yml file has been updated\n" >> $DEBUG_FILE
 
 # Configure rosco.yml file  
-sudo sed -i "/# debianRepository:/s/.*/debianRepository: $JENKINS_URL:9999 trusty main/" /opt/rosco/config/rosco.yml
+sudo sed -i "/# debianRepository:/s/.*/debianRepository: $DEBIAN_REPO:9999 trusty main/" /opt/rosco/config/rosco.yml
 sudo sed -i '/defaultCloudProviderType/s/.*/defaultCloudProviderType: azure/' /opt/rosco/config/rosco.yml
 sudo printf "rosco.yml file has been updated\n" >> $DEBUG_FILE
 
