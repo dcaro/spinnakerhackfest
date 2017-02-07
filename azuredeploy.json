@@ -144,7 +144,7 @@
     "subnet2Name": "[concat(variables('scenarioPrefix'),'Subnet2')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
     "subnet0Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet0Name'))]",
-    "jenkinsFQDN": "[concat('http:\/\/', parameters('jenkinsDnsPrefix'), '.', resourceGroup().location, '.cloudapp.azure.com' )]"
+    "jenkinsFQDN": "[concat(parameters('jenkinsDnsPrefix'), '.', resourceGroup().location, '.cloudapp.azure.com' )]"
   },
     "resources": [
         {

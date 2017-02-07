@@ -25,7 +25,7 @@ while getopts ":t:s:p:c:h:r:l:k:u:q:f:a:i:" opt; do
     ;;
     k) KEYVAULT="$OPTARG"
     ;;
-    i) JENKINS_URL="$OPTARG"
+    i) JENKINS_FQDN="$OPTARG"
     ;;
     u) JENKINS_USERNAME="$OPTARG"
     ;;
@@ -40,7 +40,7 @@ done
 
 WORKDIR=$(pwd)
 # Usually the workdir is /var/lib/waagent/custom-script/download/0
-#JENKINS_URL='http:\/\/10.0.0.5'
+JENKINS_URL='http:\/\/'$JENKINS_FQDN
 DEBUG_FILE=$WORKDIR"/debugfile"
 SED_FILE=$WORKDIR"/sedCommand.sed"
 
