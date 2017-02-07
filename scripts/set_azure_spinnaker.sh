@@ -7,7 +7,7 @@
 JENKINS_USERNAME=""
 JENKINS_PASSWORD=""
 
-while getopts ":t:s:p:c:h:r:l:k:b:j:u:q:" opt; do
+while getopts ":t:s:p:c:h:r:l:k:u:q:f:a:" opt; do
   case $opt in
     t) TENANTID="$OPTARG"
     ;;
@@ -24,10 +24,6 @@ while getopts ":t:s:p:c:h:r:l:k:b:j:u:q:" opt; do
     l) RESOURCEGROUPLOCATION="$OPTARG"
     ;;
     k) KEYVAULT="$OPTARG"
-    ;;
-    b) BINTRAY="$OPTARG"
-    ;;
-    j) JENKINS_URL="$OPTARG"
     ;;
     u) JENKINS_USERNAME="$OPTARG"
     ;;
@@ -117,8 +113,8 @@ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB9B1D8886F44E2A
 sudo printf "apt-key done\n" >> $DEBUG_FILE
 
 # Removing debug file
-sudo rm -f $DEBUG_FILE
-sudo rm -f $SED_FILE
+# sudo rm -f $DEBUG_FILE
+# sudo rm -f $SED_FILE
 
 # rebooting the VM to avoid issues with front50
 sudo shutdown -r now "Rebooting the system after Spinnaker installation" 
