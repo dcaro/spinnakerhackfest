@@ -143,7 +143,8 @@
     "subnet1Name": "[concat(variables('scenarioPrefix'),'Subnet1')]",
     "subnet2Name": "[concat(variables('scenarioPrefix'),'Subnet2')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
-    "subnet0Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet0Name'))]"
+    "subnet0Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet0Name'))]",
+    "jenkinsFQDN": "[concat('http://', parameters('spinnakerDnsPrefix'), '.', resourceGroup().location, '.cloudapp.azure.com' )]"
   },
     "resources": [
         {
@@ -213,7 +214,8 @@
                             "subnet0Ref": "[variables('subnet0Ref')]",
                             "privateIp": "10.0.0.4",
                             "storageKey": "[reference('storage-deployment').outputs.storageKey.value]",
-                            "front50StorageAccountName": "[variables('front50StorageAccountName')]"
+                            "front50StorageAccountName": "[variables('front50StorageAccountName')]",
+                            "jenkinsURL": "[variables('jenkinsFQDN')]"
                         }
                     },
                     "Keyvault": {

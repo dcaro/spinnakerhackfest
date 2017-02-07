@@ -226,7 +226,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash set_azure_spinnaker.sh', ' -s ', subscription().subscriptionId, ' -t ', subscription().tenantId, ' -c ', parameters('Keyvault').clientId, ' -p ', parameters('Keyvault').clientSecret, ' -r ', resourceGroup().name, ' -l ', resourceGroup().location, ' -h ', parameters('packerStorageAccountName'), ' -k ', parameters('Keyvault').name, ' -f ', parameters('SpinnakerVM').front50StorageAccountName, ' -a ', parameters('SpinnakerVM').storageKey, ' -u ', parameters('Account').JenkinsUser, ' -q ', parameters('Account').JenkinsPassword)]"
+                    "commandToExecute": "[concat('bash set_azure_spinnaker.sh', ' -s ', subscription().subscriptionId, ' -t ', subscription().tenantId, ' -c ', parameters('Keyvault').clientId, ' -p ', parameters('Keyvault').clientSecret, ' -r ', resourceGroup().name, ' -l ', resourceGroup().location, ' -h ', parameters('packerStorageAccountName'), ' -k ', parameters('Keyvault').name, ' -f ', parameters('SpinnakerVM').front50StorageAccountName, ' -a ', parameters('SpinnakerVM').storageKey, ' -u ', parameters('Account').JenkinsUser, ' -q ', parameters('Account').JenkinsPassword, ' -i ', parameters('SpinnakerVM').jenkinsURL)]"
                 }
             }
         }

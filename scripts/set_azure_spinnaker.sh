@@ -7,7 +7,7 @@
 JENKINS_USERNAME=""
 JENKINS_PASSWORD=""
 
-while getopts ":t:s:p:c:h:r:l:k:u:q:f:a:" opt; do
+while getopts ":t:s:p:c:h:r:l:k:u:q:f:a:i:" opt; do
   case $opt in
     t) TENANTID="$OPTARG"
     ;;
@@ -25,6 +25,8 @@ while getopts ":t:s:p:c:h:r:l:k:u:q:f:a:" opt; do
     ;;
     k) KEYVAULT="$OPTARG"
     ;;
+    i) JENKINS_URL="$OPTARG"
+    ;;
     u) JENKINS_USERNAME="$OPTARG"
     ;;
     q) JENKINS_PASSWORD="$OPTARG"
@@ -38,7 +40,7 @@ done
 
 WORKDIR=$(pwd)
 # Usually the workdir is /var/lib/waagent/custom-script/download/0
-JENKINS_URL='http:\/\/10.0.0.5'
+#JENKINS_URL='http:\/\/10.0.0.5'
 DEBUG_FILE=$WORKDIR"/debugfile"
 SED_FILE=$WORKDIR"/sedCommand.sed"
 
