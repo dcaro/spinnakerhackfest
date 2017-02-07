@@ -37,7 +37,7 @@ Deploying from the command line
 ## C. Unlock Jenkins
 1. SSH to the JenkinsVM and run `sudo vim /var/lib/jenkins/secrets/initialAdminPassword` to get the initial password.
 1. Navigate to 'http://jenkinsdnslabel.region.cloudapp.azure.com:8080' and enter the password to unlock Jenkins for the first time.
-1. Follow prompts to install the default plugins and create a jenkins user with the same parameters as the ones entered at the deployment of the VM.
+1. Follow prompts to install the default plugins and create a jenkins user **with the same parameters as the ones entered at the deployment of the VM**.
 
 ## D. Initialize Jenkins 
 1. SSH to Jenkins and run the following command: ``/opt/azure_jenkins_config/init_jenkins.sh `` 

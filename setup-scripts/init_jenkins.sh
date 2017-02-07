@@ -45,6 +45,14 @@ case $key in
    APTLY_REPO_NAME="$2"
    shift
    ;;
+   -ju)
+   JENKINS_USER="$2"
+   shift
+   ;;
+   -jp)
+   JENKINS_PWD="$2"
+   shift
+   ;;
    *)
 
    ;;
@@ -57,8 +65,22 @@ $WORKDIR/setup_aptly.sh -ar $APTLY_REPO_NAME
 # Pausing to allow nginx to start completely
 sleep 10
 
-# This script to configure the following stuff from Jenkins automatically: JDK, Oracle user and password, Gradle
-sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://$JENKINS_USER:$JENKINS_PWD@localhost:8080 groovy $WORKDIR/init.groovy $ORACLE_USER $ORACLE_PASSWORD
+# Verify that we can login to Jenkins
+error_check=$(sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://$JENKINS_USER:$JENKINS_PWD@localhost:8080 who-am-i 2> /dev/null)
 
-sudo service jenkins stop 
-sudo service jenkins start 
+if [ -z "$error_check" ]
+then
+        echo -e "\e[31mError\e[0m - Jenkins Authentication Error \n"
+        echo "Your Jenkins credentials do not match the Jenkins user \n"
+        echo "Please run the script again with the following command: \n"
+        echo "init_jenkins.sh -ju %YOUR_JENKINS_USERNAME% -jp %JENKINS_USER_PASSWORD%"
+else
+        echo -e "\e[33mAuthenticated\e[0m"
+        # This script to configure the following stuff from Jenkins automatically: JDK, Oracle user and password, Gradle
+        sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://$JENKINS_USER:$JENKINS_PWD@localhost:8080 groovy $WORKDIR/init.groovy $ORACLE_USER $ORACLE_PASSWORD
+
+        sudo service jenkins stop 
+        sudo service jenkins start 
+fi
+
+
