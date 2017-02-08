@@ -140,7 +140,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('JenkinsVM').vmSize]"
+                    "vmSize": "Standard_DS12_v2"
                 },
                 "osProfile": {
                     "computerName": "[variables('vmName')]",

@@ -169,7 +169,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('SpinnakerVM').vmSize]"
+                    "vmSize": "Standard_DS12_v2"
                 },
                 "osProfile": {
                     "computerName": "[variables('vmName')]",

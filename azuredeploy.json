@@ -2,44 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "spinnakerVMSize": {
-            "type": "string",
-            "allowedValues": [
-                "Standard_A1",
-                "Standard_A2",
-                "Standard_A3",
-                "Standard_A4",
-                "Standard_D1",
-                "Standard_D2",
-                "Standard_D3",
-                "Standard_D4",
-                "Standard_DS12_v2",
-                "Standard_DS11_v2"
-            ],
-            "metadata": {
-                "description": "Size of the Spinnaker VM."
-            },
-            "defaultValue": "Standard_DS12_v2"
-        },
-        "jenkinsVMSize": {
-            "type": "string",
-            "allowedValues": [
-                "Standard_A1",
-                "Standard_A2",
-                "Standard_A3",
-                "Standard_A4",
-                "Standard_D1",
-                "Standard_D2",
-                "Standard_D3",
-                "Standard_D4",
-                "Standard_DS12_v2",
-                "Standard_DS11_v2"
-            ],
-            "metadata": {
-                "description": "Size of the Jenkins VM."
-            },
-            "defaultValue": "Standard_DS12_v2"
-        },
         "spinnakerDnsPrefix": {
             "type": "string",
             "metadata": {
@@ -210,7 +172,6 @@
                             "StorageAccountName": "[variables('storageAccountName')]",
                             "StorageAccountContainerName": "[variables('storageAccountContainerName')]",
                             "dnsPrefix": "[parameters('spinnakerDnsPrefix')]",
-                            "vmSize": "[parameters('spinnakerVMSize')]",
                             "subnet0Ref": "[variables('subnet0Ref')]",
                             "privateIp": "10.0.0.4",
                             "storageKey": "[reference('storage-deployment').outputs.storageKey.value]",
@@ -259,7 +220,6 @@
                             "StorageAccountName": "[variables('storageAccountName')]",
                             "StorageAccountContainerName": "[variables('storageAccountContainerName')]",
                             "dnsPrefix": "[parameters('jenkinsDnsPrefix')]",
-                            "vmSize": "[parameters('jenkinsVMSize')]",
                             "subnet0Ref": "[variables('subnet0Ref')]",
                             "privateIp": "10.0.0.5"
                         }
