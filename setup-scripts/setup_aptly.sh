@@ -27,10 +27,10 @@ sudo chown jenkins:jenkins $WORK_DIR/aptly
 sudo chmod +x $WORK_DIR/aptly
 
 echo "Creating repo"
-$WORK_DIR/aptly repo create $APTLY_REPO_NAME
-
-echo "Publishing repo"
-$WORK_DIR/aptly publish repo -architectures="amd64" -component=main -distribution=trusty -skip-signing=true $APTLY_REPO_NAME
+sudo -u jenkins -i << EOF
+    $WORK_DIR/aptly repo create $APTLY_REPO_NAME
+    $WORK_DIR/aptly publish repo -architectures="amd64" -component=main -distribution=trusty -skip-signing=true $APTLY_REPO_NAME
+EOF
 
 #install nginx
 echo "Installing nginx"
