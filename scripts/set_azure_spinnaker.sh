@@ -106,7 +106,7 @@ sudo printf "}\n" >> $SED_FILE
 sudo printf "/front50:/ {\n    N\n     /cassandra:/ {\n         N\n         s/enabled: true/enabled: false/\n         }\n    }\n" >> $SED_FILE
 
 # Configure Azure storage
-sudo printf "/azure:/ {\n   N\n   s/enabled: false/enabled: true/\n   N\n   s/storageAccountName:/storageAccountName: $FRONT50_STORAGE/\n   N\n   s/storageAccountKey:/storageAccountKey: $FRONT50_KEY/\n   }\n" >> $SED_FILE
+sudo printf "/azure:/ {\n   N\n   s/enabled: false/enabled: true/\n   N\n   s/storageAccountName:/storageAccountName: $FRONT50_STORAGE/\n   N\n   s|storageAccountKey:|storageAccountKey: $FRONT50_KEY|\n   }\n" >> $SED_FILE
 
 sudo printf "sedCommand.sed file created\n" >> $DEBUG_FILE
 
