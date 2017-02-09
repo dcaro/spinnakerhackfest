@@ -30,7 +30,7 @@ Deploying from the command line
 1. Fill in the parameters in your copy of the ` azuredeploy.parameters.json ` file. The Spinnaker VM and Jenkins VM will use the same username and password. The client id and key for your service principal are the once that have been created above.
 1. Deploy the solution with the following command: 
 
-` az group deployment create -g spinnakergroup -n deploy --template-file ./azuredeploy.json --parameters @./azuredeploy.myparams.json `
+` az group deployment create -g spinnakergroup -n deploy --template-file ./azuredeploy.json --parameters @./azuredeploy.parameters.json `
 
 **Note**: If you use a local parameters file, you must prefix the path with the '@' signe as indicated in the sample above.
 
