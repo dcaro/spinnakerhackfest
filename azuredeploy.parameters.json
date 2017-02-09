@@ -8,12 +8,6 @@
     "vmPassword": {
       "value": "GEN-PASSWORD"
     },
-    "spinnakerVMSize": {
-      "value": "Standard_D2"
-    },
-    "jenkinsVMSize": {
-      "value": "Standard_D2"
-    },
     "spinnakerDnsPrefix": {
       "value": "GEN-UNIQUE"
     },
