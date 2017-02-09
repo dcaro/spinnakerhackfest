@@ -41,7 +41,8 @@ EOT
 
 ./gradlew clean packDeb"""
 
-def ShellBuildStep2 = """/opt/aptly/aptly repo add -force-replace hello build/distributions/*.deb /opt/aptly/aptly publish update -force-overwrite -architectures="amd64" -skip-signing=true trusty
+def ShellBuildStep2 = """~/aptly repo add -force-replace myrepo build/distributions/*.deb 
+~/aptly publish update -force-overwrite -architectures="amd64" -skip-signing=true trusty
 """
 
 // Add github credentials to Jenkins domains
@@ -51,8 +52,8 @@ SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(
 
 // Create as sample workflow
 println 'create workflow'
-job = Jenkins.instance.createProject(FreeStyleProject, 'hello_world')
-job.displayName = 'Build Hello World'
+job = Jenkins.instance.createProject(FreeStyleProject, 'Hello-Karyon')
+job.displayName = 'Hello-Karyon'
 job.scm = new GitSCM(GitHubRepo)
 job.scm.userRemoteConfigs[0].credentialsId = "github_user"
 job.addTrigger(new SCMTrigger("* * * * *"))

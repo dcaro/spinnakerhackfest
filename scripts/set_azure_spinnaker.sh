@@ -55,6 +55,7 @@ sudo printf "RESOURCEGROUP=%s\n" $RESOURCEGROUP >> $DEBUG_FILE
 sudo printf "RESOURCEGROUPLOCATION=%s\n" $RESOURCEGROUPLOCATION >> $DEBUG_FILE
 sudo printf "KEYVAULT=%s\n" $KEYVAULT >> $DEBUG_FILE
 sudo printf "JENKINS_URL=%s\n" $JENKINS_URL >> $DEBUG_FILE
+sudo printf "FRONT50_KEY=%s\n" $FRONT50_KEY >> $DEBUG_FILE
 
 sudo printf "working directory is %s\n" $WORKDIR >> $DEBUG_FILE
 
@@ -69,9 +70,9 @@ sudo printf "directory /var/lib/dpkg/updates removed\n" >> $DEBUG_FILE
 sudo apt-get upgrade -y
 sudo printf "apt-get upgrade completed\n" >> $DEBUG_FILE
 
-# Install Spinnaker on the VM
+# Install Spinnaker on the VM with no cassandra
 sudo printf "Starting to install Spinnaker\n" >> $DEBUG_FILE
-curl --silent https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh | sudo bash -s -- --cloud_provider azure --azure_region $RESOURCEGROUPLOCATION
+curl --silent https://raw.githubusercontent.com/spinnaker/spinnaker/master/InstallSpinnaker.sh | sudo bash -s -- --cloud_provider azure --azure_region $RESOURCEGROUPLOCATION --noinstall_cassandra
 
 sudo printf "Spinnaker has been installed\n" >> $DEBUG_FILE
 
@@ -80,7 +81,8 @@ sudo printf "Spinnaker has been installed\n" >> $DEBUG_FILE
 
 sudo printf "Setting up sedCommand \n" >> $DEBUG_FILE
 
-sudo printf "s/enabled: ${SPINNAKER_AZURE_ENABLED:false}/enabled: ${SPINNAKER_AZURE_ENABLED:true}/g\n" > $SED_FILE
+sudo printf "s/enabled: \${SPINNAKER_AZURE_ENABLED:false}/enabled: \${SPINNAKER_AZURE_ENABLED:true}/g\n" > $SED_FILE
+sudo printf "s/defaultRegion: \${SPINNAKER_AZURE_DEFAULT_REGION:westus}/defaultRegion: \${SPINNAKER_AZURE_DEFAULT_REGION:$RESOURCEGROUPLOCATION}/g\n" > $SED_FILE
 sudo printf "s/clientId:$/& %s/\n" $CLIENTID >> $SED_FILE
 sudo printf "s/appKey:$/& %s/\n" $PASSWORD >> $SED_FILE
 sudo printf "s/tenantId:$/& %s/\n" $TENANTID >> $SED_FILE
@@ -99,6 +101,12 @@ sudo printf "/name: Jenkins.*/ {\n N\n /baseUrl:/ { s/baseUrl:.*/baseUrl: %s:808
 sudo printf " N\n /username:/ { s/username:/username: %s/ }\n" $JENKINS_USERNAME >> $SED_FILE
 sudo printf " N\n /password:/ { s/password:/password: %s/ }\n" $JENKINS_PASSWORD >> $SED_FILE
 sudo printf "}" >> $SED_FILE
+
+# Disable cassandra
+sudo printf "/front50:/ {\n    N\n     /cassandra:/ {\n         N\n         s/enabled: true/enabled: false/\n         }\n    }\n" >> $SED_FILE
+
+# Configure Azure storage
+sudo printf "/azure:/ {\n   N\n   s/enabled: false/enabled: true/\n   N\n   s/storageAccountName:/storageAccountName: $FRONT50_STORAGE/\n   N\n   s/storageAccountKey:/storageAccountKey: $FRONT50_KEY/\n   }\n"
 
 sudo printf "sedCommand.sed file created\n" >> $DEBUG_FILE
 
