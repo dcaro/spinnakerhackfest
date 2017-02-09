@@ -82,7 +82,7 @@ sudo printf "Spinnaker has been installed\n" >> $DEBUG_FILE
 sudo printf "Setting up sedCommand \n" >> $DEBUG_FILE
 
 sudo printf "s/enabled: \${SPINNAKER_AZURE_ENABLED:false}/enabled: \${SPINNAKER_AZURE_ENABLED:true}/g\n" > $SED_FILE
-sudo printf "s/defaultRegion: \${SPINNAKER_AZURE_DEFAULT_REGION:westus}/defaultRegion: \${SPINNAKER_AZURE_DEFAULT_REGION:$RESOURCEGROUPLOCATION}/g\n" > $SED_FILE
+sudo printf "s/defaultRegion: \${SPINNAKER_AZURE_DEFAULT_REGION:westus}/defaultRegion: \${SPINNAKER_AZURE_DEFAULT_REGION:$RESOURCEGROUPLOCATION}/g\n" >> $SED_FILE
 sudo printf "s/clientId:$/& %s/\n" $CLIENTID >> $SED_FILE
 sudo printf "s/appKey:$/& %s/\n" $PASSWORD >> $SED_FILE
 sudo printf "s/tenantId:$/& %s/\n" $TENANTID >> $SED_FILE
