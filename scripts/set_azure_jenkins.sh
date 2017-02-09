@@ -9,13 +9,13 @@ INITIAL_JENKINS_CONFIG="init_jenkins.sh"
 APTLY_SCRIPT="setup_aptly.sh"
 JENKINS_GROOVY="init.groovy"
 JENKINS_HOME="/var/lib/jenkins/"
-#SOURCE_URI="https://raw.githubusercontent.com/arroyc/azure-quickstart-templates/master/azure-jenkins/setup-scripts/"
-SOURCE_URI="https://raw.githubusercontent.com/dcaro/spinnakerhackfest/master/setup-scripts/"
-ORACLE_USER="$3"
-ORACLE_PASSWORD="$4"
+
 JENKINS_USER="$1"
 JENKINS_PWD="$2"
+ORACLE_USER="$3"
+ORACLE_PASSWORD="$4"
 APTLY_REPO_NAME="$5"
+SOURCE_URI="$6"
 
 #delete any previous user if there is any
 if [ ! -d $JENKINS_USER ]
@@ -51,8 +51,6 @@ sudo chmod +x $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
 
 # Download Jenkins Groovy script
 sudo wget -O $SETUP_SCRIPTS_LOCATION$JENKINS_GROOVY $SOURCE_URI$JENKINS_GROOVY
-# sudo wget -O $JENKINS_HOME$JENKINS_GROOVY $SOURCE_URI$JENKINS_GROOVY
-# sudo chown jenkins:jenkins $JENKINS_HOME$JENKINS_GROOVY
 
 # Download aptly setup script
 sudo wget -O $SETUP_SCRIPTS_LOCATION$APTLY_SCRIPT $SOURCE_URI$APTLY_SCRIPT
@@ -68,7 +66,7 @@ fi
 # Installing git 
 sudo apt-get install git -y
 
-# Replace the Oracle username and password in the init script
+#Replace the Oracle username and password in the init script
 SED_STRING3='s/ORACLE_USER=\"\"/ORACLE_USER=\"'$ORACLE_USER'\"/'
 sudo sed -i $SED_STRING3 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
 

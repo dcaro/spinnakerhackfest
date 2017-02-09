@@ -21,10 +21,10 @@
             }
         },
         "_artifactsLocation": {
-          "type": "string"
+            "type": "string"
         },
         "_artifactsLocationSasToken": {
-          "type": "securestring"
+            "type": "securestring"
         }
     },
     "variables": {
@@ -35,8 +35,7 @@
         "nsgName": "[concat(variables('scenarioPrefix'), 'NSG')]",
         "vmName": "[concat(variables('scenarioPrefix'), 'Vm')]"
     },
-    "resources": [
-        {
+    "resources": [{
             "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('publicIPAddressName')]",
@@ -54,8 +53,7 @@
             "name": "[variables('nsgName')]",
             "location": "[resourceGroup().location]",
             "properties": {
-                "securityRules": [
-                    {
+                "securityRules": [{
                         "name": "ssh_rule",
                         "properties": {
                             "description": "Allow SSH",
@@ -113,21 +111,19 @@
                 "networkSecurityGroup": {
                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
                 },
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[parameters('JenkinsVM').privateIp]",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
-                            },
-                            "subnet": {
-                                "id": "[parameters('JenkinsVM').subnet0Ref]"
-                            }
+                "ipConfigurations": [{
+                    "name": "ipconfig1",
+                    "properties": {
+                        "privateIPAllocationMethod": "Static",
+                        "privateIPAddress": "[parameters('JenkinsVM').privateIp]",
+                        "publicIPAddress": {
+                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+                        },
+                        "subnet": {
+                            "id": "[parameters('JenkinsVM').subnet0Ref]"
                         }
                     }
-                ]
+                }]
             }
         },
         {
@@ -164,11 +160,9 @@
                     }
                 },
                 "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
-                        }
-                    ]
+                    "networkInterfaces": [{
+                        "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                    }]
                 }
             }
         },
@@ -191,7 +185,7 @@
                     ],
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('Account').JenkinsUser, ' ', parameters('Account').JenkinsPassword, ' ', parameters('Account').OracleUserName, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName)]"
+                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('Account').JenkinsUser, ' ', parameters('Account').JenkinsPassword, ' ', parameters('Account').OracleUserName, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName, ' ', parameters('_artifactsLocation'))]"
                 }
             }
         }
