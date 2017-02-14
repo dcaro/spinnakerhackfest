@@ -77,7 +77,7 @@ curl --silent https://raw.githubusercontent.com/spinnaker/spinnaker/master/Insta
 sudo printf "Spinnaker has been installed\n" >> $DEBUG_FILE
 
 # configure to not use cassandra
-sudo /opt/spinnaker/install/change_cassandra.sh --echo=inMemory --front50=azure
+sudo /opt/spinnaker/install/change_cassandra.sh --echo=inMemory --front50=azs
 sudo printf "Configured to not use cassandra" >> $DEBUG_FILE
 
 # Configuring the /opt/spinnaker/config/default-spinnaker-local.yml
