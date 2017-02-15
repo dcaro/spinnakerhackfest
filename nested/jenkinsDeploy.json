@@ -17,7 +17,7 @@
         "Account": {
             "type": "object",
             "metadata": {
-                "Description": "The username and password to initial Jenkins setup."
+                "Description": "The username and SSH Key to initial Jenkins setup."
             }
         },
         "_artifactsLocation": {
@@ -141,7 +141,17 @@
                 "osProfile": {
                     "computerName": "[variables('vmName')]",
                     "adminUsername": "[parameters('Keyvault').userName]",
-                    "adminPassword": "[parameters('Keyvault').password]"
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": "true",
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('Keyvault').userName, '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('Keyvault').sshkey]"
+                                }
+                            ]
+                        }
+                    }
                 },
                 "storageProfile": {
                     "imageReference": {

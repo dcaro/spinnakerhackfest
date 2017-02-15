@@ -5,8 +5,8 @@
     "vmUserName": {
       "value": "GEN-USERNAME"
     },
-    "vmPassword": {
-      "value": "GEN-PASSWORD"
+    "vmSSHKey": {
+      "value": "GEN-SSH-PUB-KEY"
     },
     "spinnakerDnsPrefix": {
       "value": "GEN-UNIQUE"

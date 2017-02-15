@@ -17,13 +17,13 @@
         "vmUserName": {
             "type": "string",
             "metadata": {
-                "description": "Login user name for the spinnaker VM."
+                "description": "Login user name for the Jenkins and Spinnaker VM."
             }
         },
-        "vmPassword": {
-            "type": "securestring",
+        "vmSSHKey": {
+            "type": "string",
             "metadata": {
-                "description": "Login password for the spinnaker VM."
+                "description": "SSH Key for VMs: Jenkins and Spinnaker."
             }
         },
         "servicePrincipalClientId": {
@@ -183,7 +183,7 @@
                         "value": {
                             "name": "[parameters('keyVaultAccountName')]",
                             "userName": "[parameters('vmUsername')]",
-                            "password": "[parameters('vmPassword')]",
+                            "sshkey": "[parameters('vmSSHKey')]",
                             "clientId": "[parameters('servicePrincipalClientId')]",
                             "clientSecret": "[parameters('servicePrincipalClientSecret')]"
                         }
@@ -227,7 +227,7 @@
                     "Keyvault": {
                         "value": {
                             "userName": "[parameters('vmUsername')]",
-                            "password": "[parameters('vmPassword')]"
+                            "sshkey": "[parameters('vmSSHKey')]"
                         }
                     },
                     "Account": {
