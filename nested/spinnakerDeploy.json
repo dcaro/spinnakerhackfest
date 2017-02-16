@@ -174,17 +174,7 @@
                 "osProfile": {
                     "computerName": "[variables('vmName')]",
                     "adminUsername": "[parameters('Keyvault').userName]",
-                    "linuxConfiguration": {
-                        "disablePasswordAuthentication": "true",
-                        "ssh": {
-                            "publicKeys": [
-                                {
-                                    "path": "[concat('/home/', parameters('Keyvault').userName, '/.ssh/authorized_keys')]",
-                                    "keyData": "[parameters('Keyvault').sshkey]"
-                                }
-                            ]
-                        }
-                    }
+                    "adminPassword": "[parameters('Keyvault').password]"
                 },
                 "storageProfile": {
                     "imageReference": {
