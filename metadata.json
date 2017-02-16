@@ -3,5 +3,5 @@
     "description": "Deploys instances of Spinnaker and Jenkins CI tools configured to target the Azure platform onto a Linux VM in Azure",
     "summary": "Create two new Linux Ubuntu 14.04 LTS VM, one with Jenkins, one with Spinnaker, configured to communicate with Azure and between each others",
     "githubUsername": "dcaro",
-    "dateUpdated": "2017-02-04"
+    "dateUpdated": "2017-02-15"
 }
