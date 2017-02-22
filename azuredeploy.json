@@ -218,7 +218,8 @@
             "name": "jenkins-deployment",
             "dependsOn": [
                 "Microsoft.Resources/deployments/storage-deployment",
-                "Microsoft.Resources/deployments/vnet-deployment"
+                "Microsoft.Resources/deployments/vnet-deployment",
+                "Microsoft.Network/publicIPAddresses/jenkinsPublicIP"
             ],
             "properties": {
                 "mode": "Incremental",
