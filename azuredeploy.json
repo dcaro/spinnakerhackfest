@@ -5,13 +5,13 @@
         "spinnakerDnsPrefix": {
             "type": "string",
             "metadata": {
-                "description": "DNS prefix for the Spinnaker VM. dnsprefix.azureregion.cloudapp.azure.com, for example."
+                "description": "Unique DNS Name for the Public IP used to access the Spinnaker Virtual Machine."
             }
         },
         "jenkinsDnsPrefix": {
             "type": "string",
             "metadata": {
-                "description": "DNS prefix for the Jenkins VM. dnsprefix.azureregion.cloudapp.azure.com, for example."
+                "description": "Unique DNS Name for the Public IP used to access the Jenkins Virtual Machine."
             }
         },
         "vmUserName": {
@@ -56,7 +56,7 @@
                 "description": "Password of your Oracle account."
             }
         },
-        "JenkinsUser": {
+        "JenkinsUserName": {
             "type": "string",
             "metadata": {
                 "description": "Name of your Jenkins User account."
@@ -64,7 +64,7 @@
             "defaultValue": "jenkins"
         },
         "JenkinsPassword": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Password of your Jenkins User account."
             }
@@ -72,7 +72,7 @@
         "AptlyRepoName" : { 
             "type": "string",
             "metadata": {
-                "description": "Aptly Repo name"
+                "description": "A repository with that name will be created locally on the Jenkins VM with Aptly. Aptly is a tool for Debian repository management"
             }
         },
         "_artifactsLocation": {

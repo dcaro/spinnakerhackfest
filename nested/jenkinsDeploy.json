@@ -182,13 +182,18 @@
                 "settings": {
                     "fileUris": [
                         "[concat(parameters('_artifactsLocation'), 'scripts/set_azure_jenkins.sh', parameters('_artifactsLocationSasToken'))]"
-                    ],
+                    ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('Account').JenkinsUser, ' ', parameters('Account').JenkinsPassword, ' ', parameters('Account').OracleUserName, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName, ' ', parameters('_artifactsLocation'),'setup-scripts/')]"
+                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('Account').JenkinsUserName, ' ', parameters('Account').JenkinsPassword, ' ', parameters('Account').OracleUserName, ' ', parameters('Account').OraclePassword, ' ', parameters('Account').AptlyRepoName, ' ', parameters('_artifactsLocation'),'setup-scripts/')]"
                 }
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+            "JenkinsFQDN": {
+            "type": "string",
+            "value": "[reference('publicIPAddressName').dnsSettings.fqdn]"
+        }
+    }
 }
