@@ -35,18 +35,7 @@
         "nsgName": "[concat(variables('scenarioPrefix'), 'NSG')]",
         "vmName": "[concat(variables('scenarioPrefix'), 'Vm')]"
     },
-    "resources": [{
-            "apiVersion": "2016-03-30",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('publicIPAddressName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('JenkinsVM').dnsPrefix]"
-                }
-            }
-        },
+    "resources": [
         {
             "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/networkSecurityGroups",
