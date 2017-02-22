@@ -193,7 +193,7 @@
     "outputs": {
             "JenkinsFQDN": {
             "type": "string",
-            "value": "[reference('publicIPAddressName').dnsSettings.fqdn]"
+            "value": "[reference('[variables('publicIPAddressName')]').dnsSettings.fqdn]"
         }
     }
 }
