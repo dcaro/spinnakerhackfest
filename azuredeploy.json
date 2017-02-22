@@ -170,7 +170,7 @@
             "dependsOn": [
                 "Microsoft.Resources/deployments/storage-deployment",
                 "Microsoft.Resources/deployments/vnet-deployment",
-                "Microsoft.Network/publicIPAddresses/jenkinsDnsPrefix"
+                "Microsoft.Network/publicIPAddresses/jenkinsPublicIP"
             ],
             "properties": {
                 "mode": "Incremental",
