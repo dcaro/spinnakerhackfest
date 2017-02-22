@@ -157,7 +157,8 @@
             "name": "spinnaker-deployment",
             "dependsOn": [
                 "Microsoft.Resources/deployments/storage-deployment",
-                "Microsoft.Resources/deployments/vnet-deployment"
+                "Microsoft.Resources/deployments/vnet-deployment",
+                "Microsoft.Network/publicIPAddresses/jenkinsPublicIP"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -175,7 +176,7 @@
                             "privateIp": "10.0.0.4",
                             "storageKey": "[reference('storage-deployment').outputs.storageKey.value]",
                             "front50StorageAccountName": "[variables('front50StorageAccountName')]",
-                            "jenkinsURL": "[reference('jenkins-deployment').outputs.JenkinsFQDN.value]"
+                            "jenkinsURL": "[reference('jenkinsPublicIP').dnsSettings.fqdn]"
                         }
                     },
                     "Keyvault": {
