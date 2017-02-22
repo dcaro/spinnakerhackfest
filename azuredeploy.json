@@ -105,8 +105,7 @@
     "subnet1Name": "[concat(variables('scenarioPrefix'),'Subnet1')]",
     "subnet2Name": "[concat(variables('scenarioPrefix'),'Subnet2')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
-    "subnet0Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet0Name'))]",
-    "jenkinsFQDN": "[concat(parameters('jenkinsDnsPrefix'), '.', resourceGroup().location, '.cloudapp.azure.com' )]"
+    "subnet0Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet0Name'))]"
   },
     "resources": [
         {
@@ -176,7 +175,7 @@
                             "privateIp": "10.0.0.4",
                             "storageKey": "[reference('storage-deployment').outputs.storageKey.value]",
                             "front50StorageAccountName": "[variables('front50StorageAccountName')]",
-                            "jenkinsURL": "[variables('jenkinsFQDN')]"
+                            "jenkinsURL": "[reference('jenkins-deployment').outputs.JenkinsFQDN.value]"
                         }
                     },
                     "Keyvault": {
@@ -190,7 +189,7 @@
                     },
                     "Account": {
                         "value": {
-                            "JenkinsUser": "[parameters('JenkinsUser')]",
+                            "JenkinsUserName": "[parameters('JenkinsUserName')]",
                             "JenkinsPassword": "[parameters('JenkinsPassword')]"
                         }
                     },
@@ -235,7 +234,7 @@
                             "OracleUserName": "[parameters('OracleUserName')]",
                             "OraclePassword": "[parameters('OraclePassword')]",
                             "AptlyRepoName": "[parameters('AptlyRepoName')]",
-                            "JenkinsUser": "[parameters('JenkinsUser')]",
+                            "JenkinsUserName": "[parameters('JenkinsUserName')]",
                             "JenkinsPassword": "[parameters('JenkinsPassword')]"
                         }
                     },
