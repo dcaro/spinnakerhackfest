@@ -187,7 +187,7 @@
             "dependsOn": [
                 "Microsoft.Resources/deployments/storage-deployment",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', 'jenkinsPublicIP']"
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'jenkinsPublicIP')]"
             ],
             "properties": {
                 "mode": "Incremental",
