@@ -119,20 +119,33 @@
   },
     "resources": [
         {
-            "apiVersion": "2016-09-01",
-            "type": "Microsoft.Resources/deployments",
-            "name": "storage-deployment",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('storageTemplateUrl')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "storageAccountName": { "value": "[variables('storageAccountName')]" },
-                    "packerStorageAccountName": { "value": "[variables('packerStorageAccountName')]" },
-                    "front50StorageAccountName": { "value": "[variables('front50StorageAccountName')]" }
-                }
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('front50StorageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('packerStorageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
             }
         },
         {
@@ -203,7 +216,7 @@
                             "dnsPrefix": "[parameters('spinnakerDnsPrefix')]",
                             "subnet0Ref": "[variables('subnet0Ref')]",
                             "privateIp": "10.0.0.4",
-                            "storageKey": "[reference('storage-deployment').outputs.storageKey.value]",
+                            "storageKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('front50StorageAccountName')), '2016-01-01').keys[0].value]",
                             "front50StorageAccountName": "[variables('front50StorageAccountName')]",
                             "jenkinsURL": "[reference('jenkinsPublicIP').dnsSettings.fqdn]"
                         }
