@@ -186,8 +186,8 @@
             "name": "spinnaker-deployment",
             "dependsOn": [
                 "Microsoft.Resources/deployments/storage-deployment",
-                "Microsoft.Resources/deployments/vnet-deployment",
-                "Microsoft.Network/publicIPAddresses/jenkinsPublicIP"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'jenkinsPublicIP']"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -315,7 +315,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('jenkinsNICName'))]",
                 "Microsoft.Resources/deployments/storage-deployment",
-                "Microsoft.Resources/deployments/vnet-deployment"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
