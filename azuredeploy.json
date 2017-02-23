@@ -160,7 +160,7 @@
                         }
                     },
                     {
-                        "name": "variables('subnet2Name')]",
+                        "name": "[variables('subnet2Name')]",
                         "properties": {
                             "addressPrefix": "[variables('subnet0AddressPrefix')]"
                         }
