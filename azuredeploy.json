@@ -101,11 +101,21 @@
     "vnetTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/', 'vnetDeploy.json', parameters('_artifactsLocationSasToken'))]",
     "jenkinsTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/', 'jenkinsDeploy.json', parameters('_artifactsLocationSasToken'))]",
     "vnetName": "[concat(variables('scenarioPrefix'),'Vnet')]",
+    "vnetAddressSpace" : "10.0.0.0/20",
     "subnet0Name": "[concat(variables('scenarioPrefix'),'Subnet0')]",
+    "subnet0AddressPrefix": "10.0.0.0/24",
     "subnet1Name": "[concat(variables('scenarioPrefix'),'Subnet1')]",
+    "subnet1AddressPrefix": "10.0.1.0/24",
     "subnet2Name": "[concat(variables('scenarioPrefix'),'Subnet2')]",
+    "subnet2AddressPrefix": "10.0.2.0/24",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
-    "subnet0Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet0Name'))]"
+    "subnet0Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet0Name'))]",
+    "jenkinsNSGName": "jenkinsNSG",
+    "jenkinsNICName": "jenkinsNic",
+    "jenkinsPrivateIP": "10.0.0.5",
+    "jenkinsPublicIPAddressName": "jenkinsPublicIP",
+    "jenkinsVMName": "jenkinsVm",
+    "jenkinsOSDiskName": "jenkinsOSDisk]"
   },
     "resources": [
         {
@@ -127,28 +137,35 @@
         },
         {
             "apiVersion": "2016-09-01",
-            "type": "Microsoft.Resources/deployments",
-            "name": "vnet-deployment",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('vnetName')]",
+            "location": "[resourceGroup().location]",
             "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('vnetTemplateUrl')]",
-                    "contentVersion": "1.0.0.0"
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vnetAddressSpace')]"
+                    ]
                 },
-                "parameters": {
-                    "VirtualNetwork": {
-                        "value": {
-                            "name": "[variables('vnetName')]",
-                            "addressSpace": "10.0.0.0/20",
-                            "subnet0Name": "[variables('subnet0Name')]",
-                            "subnet1Name": "[variables('subnet1Name')]",
-                            "subnet2Name": "[variables('subnet2Name')]",
-                            "subnet0AddressPrefix": "10.0.0.0/24",
-                            "subnet1AddressPrefix": "10.0.1.0/24",
-                            "subnet2AddressPrefix": "10.0.2.0/24"
+                "subnets": [
+                    {
+                        "name": "[variables('subnet0Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet0AddressPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet0AddressPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "variables('subnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet0AddressPrefix')]"
                         }
                     }
-                }
+                ]
             }
         },
         {
@@ -213,47 +230,145 @@
             }
         },
         {
-            "apiVersion": "2016-09-01",
-            "type": "Microsoft.Resources/deployments",
-            "name": "jenkins-deployment",
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('jenkinsNSGName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [{
+                        "name": "ssh_rule",
+                        "properties": {
+                            "description": "Allow SSH",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "portal_rule",
+                        "properties": {
+                            "description": "Allow portal",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "8080",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "aptly_rule",
+                        "properties": {
+                            "description": "Allow portal",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "9999",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 102,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('jenkinsNICName')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
-                "Microsoft.Resources/deployments/storage-deployment",
-                "Microsoft.Resources/deployments/vnet-deployment",
-                "Microsoft.Network/publicIPAddresses/jenkinsPublicIP"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jenkinsNSGName'))]"
             ],
             "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('jenkinsTemplateUrl')]",
-                    "contentVersion": "1.0.0.0"
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jenkinsNSGName'))]"
                 },
-                "parameters": {
-                    "JenkinsVM": {
-                        "value": {
-                            "StorageAccountName": "[variables('storageAccountName')]",
-                            "StorageAccountContainerName": "[variables('storageAccountContainerName')]",
-                            "dnsPrefix": "[parameters('jenkinsDnsPrefix')]",
-                            "subnet0Ref": "[variables('subnet0Ref')]",
-                            "privateIp": "10.0.0.5"
+                "ipConfigurations": [{
+                    "name": "ipconfig1",
+                    "properties": {
+                        "privateIPAllocationMethod": "Static",
+                        "privateIPAddress": "[variables('jenkinsPrivateIP')]",
+                        "publicIPAddress": {
+                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('jenkinsPublicIPAddressName'))]"
+                        },
+                        "subnet": {
+                            "id": "[variables('subnet0Ref')]"
                         }
+                    }
+                }]
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('jenkinsVMName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('jenkinsNICName'))]",
+                "Microsoft.Resources/deployments/storage-deployment",
+                "Microsoft.Resources/deployments/vnet-deployment"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS12_v2"
+                },
+                "osProfile": {
+                    "computerName": "[variables('jenkinsVMName')]",
+                    "adminUsername": "[parameters('vmUsername')]",
+                    "adminPassword": "[parameters('vmPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftVisualStudio",
+                        "offer": "VisualStudio",
+                        "sku": "Azure-Jenkins-012",
+                        "version": "latest"
                     },
-                    "Keyvault": {
-                        "value": {
-                            "userName": "[parameters('vmUsername')]",
-                            "password": "[parameters('vmPassword')]"
-                        }
-                    },
-                    "Account": {
-                        "value": {
-                            "OracleUserName": "[parameters('OracleUserName')]",
-                            "OraclePassword": "[parameters('OraclePassword')]",
-                            "AptlyRepoName": "[parameters('AptlyRepoName')]",
-                            "JenkinsUserName": "[parameters('JenkinsUserName')]",
-                            "JenkinsPassword": "[parameters('JenkinsPassword')]"
-                        }
-                    },
-                    "_artifactsLocation": { "value": "[parameters('_artifactsLocation')]" },
-                    "_artifactsLocationSasToken": { "value": "[parameters('_artifactsLocationSasToken')]" }
+                    "osDisk": {
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob, variables('storageAccountContainerName'), '/', variables('jenkinsOSDiskName'), '.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [{
+                        "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('jenkinsNICName'))]"
+                    }]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('jenkinsVMName'),'/JenkinsCustomScript')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('jenkinsVMName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[concat(parameters('_artifactsLocation'), 'scripts/set_azure_jenkins.sh', parameters('_artifactsLocationSasToken'))]"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('Account').JenkinsUserName, ' ', parameters('Account').JenkinsPassword, ' ', parameters('OracleUserName'), ' ', parameters('OraclePassword'), ' ', parameters('AptlyRepoName'), ' ', parameters('_artifactsLocation'),'setup-scripts/')]"
                 }
             }
         }
