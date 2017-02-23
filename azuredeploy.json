@@ -156,13 +156,13 @@
                     {
                         "name": "[variables('subnet1Name')]",
                         "properties": {
-                            "addressPrefix": "[variables('subnet0AddressPrefix')]"
+                            "addressPrefix": "[variables('subnet1AddressPrefix')]"
                         }
                     },
                     {
                         "name": "[variables('subnet2Name')]",
                         "properties": {
-                            "addressPrefix": "[variables('subnet0AddressPrefix')]"
+                            "addressPrefix": "[variables('subnet2AddressPrefix')]"
                         }
                     }
                 ]
@@ -336,7 +336,7 @@
                     "osDisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob, variables('storageAccountContainerName'), '/', variables('jenkinsOSDiskName'), '.vhd')]"
+                            "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob, variables('storageAccountContainerName'), '/', variables('jenkinsOSDiskName'), '.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
