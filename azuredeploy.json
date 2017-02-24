@@ -201,8 +201,8 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('packerStorageAccountName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('front50StorageAccountName'))]",
-                "[resourceId('Microsoft.Storage/virtualNetworks', variables('vnetName'))]",
-                "[resourceId('Microsoft.Storage/publicIPAddresses', 'jenkinsPublicIP')]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'jenkinsPublicIP')]"
             ],
             "properties": {
                 "mode": "Incremental",
