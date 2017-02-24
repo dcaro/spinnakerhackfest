@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script is used by the azure custom script extension
+
 SETUP_SCRIPTS_LOCATION="/opt/azure_jenkins_config/"
 CONFIG_AZURE_SCRIPT="config_azure.sh"
 CLEAN_STORAGE_SCRIPT="clear_storage_config.sh"
@@ -16,6 +18,42 @@ ORACLE_USER="$3"
 ORACLE_PASSWORD="$4"
 APTLY_REPO_NAME="$5"
 SOURCE_URI="$6"
+
+while [[ $# -gt 1 ]]
+do
+key="$1"
+
+case $key in
+   -ju)
+   JENKINS_USER="$2"
+   shift
+   ;;
+   -jp)
+   JENKINS_PWD="$2"
+   shift
+   ;;
+   -ou)
+   ORACLE_USER="$2"
+   shift
+   ;;
+   -op)
+   ORACLE_PASSWORD="$2"
+   shift
+   ;;
+   -a)
+   APTLY_REPO_NAME="$2"
+   shift
+   ;;
+   -su)
+   SOURCE_URI="$2"
+   shift
+   ;;
+   *)
+
+   ;;
+esac
+shift
+done
 
 #delete any previous user if there is any
 if [ ! -d $JENKINS_USER ]
@@ -67,17 +105,9 @@ fi
 sudo apt-get install git -y
 
 #Replace the Oracle username and password in the init script
-SED_STRING3='s/ORACLE_USER=\"\"/ORACLE_USER=\"'$ORACLE_USER'\"/'
-sudo sed -i $SED_STRING3 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+sudo sed -i 's/ORACLE_USER=\"\"/ORACLE_USER=\"'$ORACLE_USER'\"/' $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+sudo sed -i 's/ORACLE_PASSWORD=\"\"/ORACLE_PASSWORD=\"'$ORACLE_PASSWORD'\"/' $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+sudo sed -i 's/JENKINS_USER=\"\"/JENKINS_USER=\"'$JENKINS_USER'\"/' $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+sudo sed -i 's/JENKINS_PWD=\"\"/JENKINS_PWD=\"'$JENKINS_PWD'\"/' $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
+sudo sed -i 's/APTLY_REPO_NAME=\"\"/APTLY_REPO_NAME=\"'$APTLY_REPO_NAME'\"/' $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
 
-SED_STRING4='s/ORACLE_PASSWORD=\"\"/ORACLE_PASSWORD=\"'$ORACLE_PASSWORD'\"/'
-sudo sed -i $SED_STRING4 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
-
-SED_STRING1='s/JENKINS_USER=\"\"/JENKINS_USER=\"'$JENKINS_USER'\"/'
-sudo sed -i $SED_STRING1 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
-
-SED_STRING2='s/JENKINS_PWD=\"\"/JENKINS_PWD=\"'$JENKINS_PWD'\"/'
-sudo sed -i $SED_STRING2 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
-
-SED_STRING5='s/APTLY_REPO_NAME=\"\"/APTLY_REPO_NAME=\"'$APTLY_REPO_NAME'\"/'
-sudo sed -i $SED_STRING5 $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG

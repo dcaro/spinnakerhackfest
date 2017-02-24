@@ -457,7 +457,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('JenkinsUserName'), ' ', parameters('JenkinsPassword'), ' ', parameters('OracleUserName'), ' ', parameters('OraclePassword'), ' ', parameters('AptlyRepoName'), ' ', parameters('_artifactsLocation'),'setup-scripts/')]"
+                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' -ju ', parameters('JenkinsUserName'), ' -jp ', parameters('JenkinsPassword'), ' -ou ', parameters('OracleUserName'), ' -a ', parameters('AptlyRepoName'), ' -su ', parameters('_artifactsLocation'),'setup-scripts/')]"
                 }
             }
         },
