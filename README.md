@@ -13,11 +13,12 @@ In order to deploy here are the steps to follow:
 
 ## A. Create a Service Principal
 1. Run `az login` to login to your subscription
-1. Run the script ./create_spn.sh passing in the name of your subscription as a parameter (-n parameter).  See script for usage documentation regarding optional parameters.
+1. Run the script ./create_service_principal.sh passing in the name of your subscription as a parameter (-n parameter).  See script for usage documentation regarding optional parameters.
 1. For more information or to follow manual steps, see [here](https://docs.microsoft.com/en-us/azure/container-service/container-service-kubernetes-service-principal#create-a-service-principal-in-azure-active-directory)
 
 ## B. Deploy Spinnaker and Jenkins VMs
 Deploying with a browser on Azure portal 
+
 1. Click the "Deploy to Azure" button. If you don't have an Azure subscription, you can follow instructions to signup for a free trial.
 1. Enter a valid name for the Spinnaker VM and Jenkins VM, as well as a user name a password you will use for both.
 1. Enter the client id and key for your service principal created above.
