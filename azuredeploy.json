@@ -198,7 +198,9 @@
             "type": "Microsoft.Resources/deployments",
             "name": "spinnaker-deployment",
             "dependsOn": [
-                "Microsoft.Resources/deployments/storage-deployment",
+                "[resourceId('Microsoft.Network/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.Network/storageAccounts', variables('packerStorageAccountName'))]",
+                "[resourceId('Microsoft.Network/storageAccounts', variables('front50StorageAccountName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
                 "[resourceId('Microsoft.Network/publicIPAddresses', 'jenkinsPublicIP')]"
             ],
@@ -327,7 +329,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('jenkinsNICName'))]",
-                "Microsoft.Resources/deployments/storage-deployment",
+                "[resourceId('Microsoft.Network/storageAccounts', variables('storageAccountName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
             ],
             "properties": {
