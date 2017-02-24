@@ -24,6 +24,7 @@ Deploying with a browser on Azure portal
 1. Enter the client id and key for your service principal created above.
 
 Deploying from the command line
+
 1. Create a resource group: 
 
 ` az group create -n spinnakergroup -l westus `
