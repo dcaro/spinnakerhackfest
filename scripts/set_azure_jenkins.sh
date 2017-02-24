@@ -3,7 +3,6 @@
 # This script is used by the azure custom script extension
 
 SETUP_SCRIPTS_LOCATION="/opt/azure_jenkins_config/"
-CONFIG_AZURE_SCRIPT="config_azure.sh"
 CLEAN_STORAGE_SCRIPT="clear_storage_config.sh"
 CREATE_STORAGE_SCRIPT="config_azure_jenkins_storage.sh"
 CREATE_SERVICE_PRINCIPAL_SCRIPT="create_service_principal.sh"
@@ -67,10 +66,6 @@ if [ ! -d "$SETUP_SCRIPTS_LOCATION" ]; then
   sudo mkdir $SETUP_SCRIPTS_LOCATION
 fi
 
-# Download config_azure script
-sudo wget -O $SETUP_SCRIPTS_LOCATION$CONFIG_AZURE_SCRIPT $SOURCE_URI$CONFIG_AZURE_SCRIPT
-sudo chmod +x $SETUP_SCRIPTS_LOCATION$CONFIG_AZURE_SCRIPT
-
 # Download clear_storage_config script
 sudo wget -O $SETUP_SCRIPTS_LOCATION$CLEAN_STORAGE_SCRIPT $SOURCE_URI$CLEAN_STORAGE_SCRIPT
 sudo chmod +x $SETUP_SCRIPTS_LOCATION$CLEAN_STORAGE_SCRIPT
@@ -110,4 +105,3 @@ sudo sed -i 's/ORACLE_PASSWORD=\"\"/ORACLE_PASSWORD=\"'$ORACLE_PASSWORD'\"/' $SE
 sudo sed -i 's/JENKINS_USER=\"\"/JENKINS_USER=\"'$JENKINS_USER'\"/' $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
 sudo sed -i 's/JENKINS_PWD=\"\"/JENKINS_PWD=\"'$JENKINS_PWD'\"/' $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
 sudo sed -i 's/APTLY_REPO_NAME=\"\"/APTLY_REPO_NAME=\"'$APTLY_REPO_NAME'\"/' $SETUP_SCRIPTS_LOCATION$INITIAL_JENKINS_CONFIG
-

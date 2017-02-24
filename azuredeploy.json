@@ -54,7 +54,8 @@
             "type": "securestring",
             "metadata": {
                 "description": "Password of your Oracle account."
-            }
+            },
+            "defaultValue": ""
         },
         "JenkinsUserName": {
             "type": "string",
