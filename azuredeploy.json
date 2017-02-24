@@ -115,7 +115,15 @@
     "jenkinsPrivateIP": "10.0.0.5",
     "jenkinsPublicIPAddressName": "jenkinsPublicIP",
     "jenkinsVMName": "jenkinsVm",
-    "jenkinsOSDiskName": "jenkinsOSDisk]"
+    "jenkinsOSDiskName": "jenkinsOSDisk",
+    "spinnakerNSGName" : "spinnakerNSG",
+    "spinnakerNICName" : "spinnakerNic",
+    "spinnakerPrivateIP" : "10.0.0.4",
+    "spinnakerPublicIPAddressName": "spinnakerPublicIP",
+    "spinnakerVMName": "spinnakerVm",
+    "spinnakerOSDiskName": "spinnakerOSDisk",
+    "keysPermissions": [ "all" ],
+    "secretsPermissions": [ "get" ]
   },
     "resources": [
         {
@@ -147,6 +155,56 @@
             "sku": {
                 "name": "Standard_LRS"
             }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2015-06-01",
+            "name": "[parameters('keyVaultAccountName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForVolumeEncryption": true,
+                "tenantId": "[subscription().tenantId]",
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[parameters('servicePrincipalClientId')]",
+                        "permissions": {
+                            "keys": "[variables('keysPermissions')]",
+                            "secrets": "[variables('secretsPermissions')]"
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "standard",
+                    "family": "A"
+                }
+            },
+            "resources": [
+                {
+                    "type": "secrets",
+                    "name": "VMUsername",
+                    "apiVersion": "2015-06-01",
+                    "properties": {
+                        "value": "[parameters('vmUsername')]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultAccountName'))]"
+                    ]
+                },
+                {
+                    "type": "secrets",
+                    "name": "VMPassword",
+                    "apiVersion": "2015-06-01",
+                    "properties": {
+                        "value": "[parameters('vmPassword')]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultAccountName')]"
+                    ]
+                }
+            ]
         },
         {
             "apiVersion": "2016-09-01",
@@ -182,7 +240,7 @@
             }
         },
         {
-            "apiVersion": "2016-03-30",
+            "apiVersion": "2016-09-01",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "jenkinsPublicIP",
             "location": "[resourceGroup().location]",
@@ -195,52 +253,13 @@
         },
         {
             "apiVersion": "2016-09-01",
-            "type": "Microsoft.Resources/deployments",
-            "name": "spinnaker-deployment",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('packerStorageAccountName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('front50StorageAccountName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', 'jenkinsPublicIP')]"
-            ],
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "spinnakerPublicIP",
+            "location": "[resourceGroup().location]",
             "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('spinnakerTemplateUrl')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "SpinnakerVM": {
-                        "value": {
-                            "StorageAccountName": "[variables('storageAccountName')]",
-                            "StorageAccountContainerName": "[variables('storageAccountContainerName')]",
-                            "dnsPrefix": "[parameters('spinnakerDnsPrefix')]",
-                            "subnet0Ref": "[variables('subnet0Ref')]",
-                            "privateIp": "10.0.0.4",
-                            "storageKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('front50StorageAccountName')), '2016-01-01').keys[0].value]",
-                            "front50StorageAccountName": "[variables('front50StorageAccountName')]",
-                            "jenkinsURL": "[reference('jenkinsPublicIP').dnsSettings.fqdn]"
-                        }
-                    },
-                    "Keyvault": {
-                        "value": {
-                            "name": "[parameters('keyVaultAccountName')]",
-                            "userName": "[parameters('vmUsername')]",
-                            "password": "[parameters('vmPassword')]",
-                            "clientId": "[parameters('servicePrincipalClientId')]",
-                            "clientSecret": "[parameters('servicePrincipalClientSecret')]"
-                        }
-                    },
-                    "Account": {
-                        "value": {
-                            "JenkinsUserName": "[parameters('JenkinsUserName')]",
-                            "JenkinsPassword": "[parameters('JenkinsPassword')]"
-                        }
-                    },
-                    "packerStorageAccountName": { "value": "[variables('packerStorageAccountName')]" },
-                    "_artifactsLocation": { "value": "[parameters('_artifactsLocation')]" },
-                    "_artifactsLocationSasToken": { "value": "[parameters('_artifactsLocationSasToken')]" }
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('spinnakerDnsPrefix')]"
                 }
             }
         },
@@ -297,10 +316,35 @@
         },
         {
             "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('spinnakerNSGName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ssh_rule",
+                        "properties": {
+                            "description": "Allow SSH",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('jenkinsNICName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('jenkinsPublicIPAddressName'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jenkinsNSGName'))]"
             ],
             "properties": {
@@ -320,6 +364,36 @@
                         }
                     }
                 }]
+            }
+        },
+        {
+            "apiVersion": "2016-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('spinnakerNICName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('spinnakerPublicIPAddressName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spinnakerNSGName'))]"
+            ],
+            "properties": {
+                "networkSecurityGroup":{
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spinnakerNSGName'))]"
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[variables('spinnakerPrivateIP')]",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('spinnakerPublicIPAddressName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnet0Ref')]"
+                            }
+                        }
+                    }
+                ]
             }
         },
         {
@@ -383,7 +457,82 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('Account').JenkinsUserName, ' ', parameters('Account').JenkinsPassword, ' ', parameters('OracleUserName'), ' ', parameters('OraclePassword'), ' ', parameters('AptlyRepoName'), ' ', parameters('_artifactsLocation'),'setup-scripts/')]"
+                    "commandToExecute": "[concat('bash set_azure_jenkins.sh', ' ', parameters('JenkinsUserName'), ' ', parameters('JenkinsPassword'), ' ', parameters('OracleUserName'), ' ', parameters('OraclePassword'), ' ', parameters('AptlyRepoName'), ' ', parameters('_artifactsLocation'),'setup-scripts/')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('spinnakerVMName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('spinnakerNICName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('front50StorageAccountName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('packerStorageAccountName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS12_v2"
+                },
+                "osProfile": {
+                    "computerName": "[variables('spinnakerVMName')]",
+                    "adminUsername": "[parameters('vmUsername')]",
+                    "adminPassword": "[parameters('vmPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "14.04.2-LTS",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob, variables('storageAccountContainerName'), '/', variables('spinnakerOSDiskName'),'.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('spinnakerNICName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": "true",
+                        "storageUri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob)]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/SpinnakerCustomScript')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('spinnakerVMName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[concat(parameters('_artifactsLocation'), 'scripts/set_azure_spinnaker.sh', parameters('_artifactsLocationSasToken'))]"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash set_azure_spinnaker.sh', ' -s ', subscription().subscriptionId, ' -t ', subscription().tenantId, ' -c ', parameters('servicePrincipalClientId'), ' -p ', parameters('servicePrincipalClientSecret'), ' -r ', resourceGroup().name, ' -l ', resourceGroup().location, ' -h ', variables('packerStorageAccountName'), ' -k ', parameters('keyVaultAccountName'), ' -f ', variables('front50StorageAccountName'), ' -a ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('front50StorageAccountName')), '2016-01-01').keys[0].value, ' -u ', parameters('JenkinsUserName'), ' -q ', parameters('JenkinsPassword'), ' -i ', reference('jenkinsPublicIP').dnsSettings.fqdn)]"
                 }
             }
         }
