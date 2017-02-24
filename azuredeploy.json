@@ -201,7 +201,7 @@
                         "value": "[parameters('vmPassword')]"
                     },
                     "dependsOn": [
-                        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultAccountName')]"
+                        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultAccountName'))]"
                     ]
                 }
             ]
