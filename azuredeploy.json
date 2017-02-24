@@ -388,10 +388,5 @@
             }
         }
     ],
-    "outputs": {
-        "listKeysOutput": {
-            "type": "string",
-            "value": "[reference('storage-deployment').outputs.storageKey.value]"
-        }
-    }
+    "outputs": { }
 }
